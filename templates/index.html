@@ -1,12 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Flask</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <title>Inicio - Marketing ML App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <h1>Welcome to {{name}}</h1>
+<body class="index-page">
+    <header>
+        <h1>Bienvenido a {{ name }}</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/login">Iniciar Sesión</a></li>
+                <li><a href="#">Acerca de</a></li>
+                <li><a href="#">Modelos ML</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Proyecto de Machine Learning en Marketing</h2>
+            <p>
+                Esta plataforma analiza patrones de comportamiento de clientes
+                para optimizar estrategias de mercadeo basadas en datos.
+            </p>
+            <a href="/login" class="btn">Comenzar</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 - Proyecto ML Marketing </p>
+    </footer>
 </body>
 </html>
