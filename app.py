@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "clave_super_segura"  # Necesaria para manejar sesiones
 
-## CONFIGURACION BASE DE DATOS
+## CONFIGURACIÓN BASE DE DATOS
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     "mssql+pyodbc://DESKTOP-PTOBCHL\\SQLEXPRESS/ml_project_aulaespejo?"
     "driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
@@ -14,9 +14,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+
 ## CLASE USUARIOS CON SUS ATRIBUTOS 
 class Usuario(db.Model):
-    __tablename__ = 'Usuarios'  # Asegura coincidencia con la tabla de SQL Server
+    __tablename__ = 'Usuarios'  # Coincidencia con la tabla de SQL Server
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
@@ -36,28 +37,25 @@ def index():
     return render_template('index.html', name='Flask Marketing App')
 
 
-# Ruta para mostrar el login (GET)
-@app.route('/login', methods=['GET'])
+# Ruta para iniciar sesión (mGET y POST)
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        correo = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        usuario = Usuario.query.filter_by(correo=correo).first()
+
+        if usuario and usuario.check_password(password):
+            session['user_id'] = usuario.id
+            session['user_name'] = usuario.nombre
+            flash('Inicio de sesión exitoso', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Datos incorrectos', 'error')
+            return redirect(url_for('login'))
+
     return render_template('login.html')
-
-
-# Ruta para procesar el login (POST)
-@app.route('/login', methods=['POST'])
-def login_post():
-    correo = request.form.get('email', '').strip().lower()
-    password = request.form.get('password', '')
-
-    user = Usuario.query.filter_by(correo=correo).first()
-
-    if not user or not user.check_password(password):
-        flash("❌ Correo o contraseña incorrectos", "error")
-        return redirect(url_for('login'))
-
-    session['user_id'] = user.id
-    session['user_name'] = user.nombre
-    flash("✅ Sesión iniciada correctamente", "success")
-    return redirect(url_for('index'))
 
 
 # Ruta para cerrar sesión
@@ -66,6 +64,45 @@ def logout():
     session.clear()
     flash("Sesión cerrada correctamente", "info")
     return redirect(url_for('login'))
+
+
+# Ruta del panel principal (Dashboard)
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('dashboard.html', user_name=session.get('user_name'))
+
+# Ruta para registrar nuevos usuarios
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        correo = request.form.get('correo', '').strip().lower()
+        password = request.form.get('password', '')
+
+        # Validaciones 
+        if not nombre or not correo or not password:
+            flash("Por favor completa todos los campos.", "error")
+            return redirect(url_for('register'))
+
+        # Verificar si ya existe el correo
+        if Usuario.query.filter_by(correo=correo).first():
+            flash("El correo ya está registrado.", "error")
+            return redirect(url_for('register'))
+
+        # Crear nuevo usuario con contraseña encriptada
+        password_hash = generate_password_hash(password)
+        nuevo_usuario = Usuario(nombre=nombre, correo=correo, password_hash=password_hash)
+
+        # Guardar en la base de datos
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+
+        flash("Registro exitoso. Ya puedes iniciar sesión.", "success")
+        return redirect(url_for('login'))
+
+    return render_template('registro.html')
 
 
 if __name__ == '__main__':
