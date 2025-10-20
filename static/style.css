@@ -111,3 +111,74 @@ button.btn {
     margin-top: 1em;
     font-size: 0.9em;
 }
+
+
+
+
+body.login-page {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.login-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 2rem 3rem;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  margin-top: 3rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 0.7rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+input:focus {
+  outline: 2px solid #00c9a7;
+}
+
+.flash-messages {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 1rem;
+}
+
+.flash {
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.flash.success {
+  background-color: rgba(0, 255, 150, 0.2);
+  border: 1px solid #00ff99;
+}
+
+.flash.error {
+  background-color: rgba(255, 80, 80, 0.2);
+  border: 1px solid #ff5050;
+}
