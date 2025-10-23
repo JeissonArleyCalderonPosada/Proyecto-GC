@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = "clave_super_segura"  # Necesaria para manejar sesiones
+app.secret_key = "clave_super_segura"
 
 ## CONFIGURACIÓN BASE DE DATOS
 app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -34,10 +34,10 @@ class Usuario(db.Model):
 # Ruta principal (Index)
 @app.route('/')
 def index():
-    return render_template('index.html', name='Flask Marketing App')
+    return render_template('index.html', name='Ziloy')
 
 
-# Ruta para iniciar sesión (mGET y POST)
+# Ruta para iniciar sesión (metodos GET y POST)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
