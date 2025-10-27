@@ -5,19 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Marketing ML App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 <body class="index-page">
-    <header>
-        <h1>Bienvenido a {{ name }}</h1>
+    <header bgcolor="black">
+        <h1 align="center">
+            <b><i>Ziloy</i></b><br>
+            <small>Junto a ti</small>
+        </h1>
         <nav>
             <ul>
-                <li><a href="/">Inicio</a></li>
+                <li><a href="#">Acerca de Nosotros</a></li>
+                <li><a href="#">Ziloy-Bot</a></li>
+                <li><a href="#">Tienda virtual</a></li>
                 <li><a href="/login">Iniciar Sesión</a></li>
-                <li><a href="#">Acerca de</a></li>
-                <li><a href="#">Modelos ML</a></li>
             </ul>
         </nav>
     </header>
+
+    <div class="container-fluid text-center text-white" style="height: 450px;">
+        <div class="row">
+            <div class="col-md-4" style="background-color: #000000;">
+                <img src="{{ url_for('static', filename='images/ZiloyLogo.png') }}" 
+                    class="img-fluid" alt="Logo Ziloy">
+            </div>
+
+            <!-- Visión -->
+            <div class="col-md-4" style="background-color: #0b7d73;">
+            <h2>VISIÓN</h2>
+            <p>
+                Para el año 2030, la empresa será reconocida en Cundinamarca como un referente en soluciones de protección de datos 
+                y cumplimiento normativo para PYMES, destacándose por su innovación, confianza y compromiso en la implementación 
+                de estrategias efectivas de seguridad de la información.
+            </p>
+            </div>
+
+            <!-- Valores -->
+            <div class="col-md-4 p-4" style="background-color: #09695f;">
+            <h2>VALORES</h2>
+            <p>
+                Compromiso, responsabilidad, innovación y respeto por la privacidad de los datos son los pilares que guían nuestras acciones 
+                hacia la excelencia y la confianza de nuestros clientes.
+            </p>
+            </div>
+        </div>
+    </div>
 
     <main>
         <section>
@@ -33,5 +65,6 @@
     <footer>
         <p>&copy; 2025 - Proyecto ML Marketing </p>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
