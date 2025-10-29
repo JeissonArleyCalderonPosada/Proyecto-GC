@@ -78,25 +78,27 @@
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2025 - Ziloy | UCundinamarca y UNL</p>
-    </footer>
-
     <!-- Ventana flotante del Chatbot -->
-    <div id="chatbotPopup" class="chatbot-popup" style="display:none;">
+    <div id="chatbotPopup" class="chatbot-popup">
         <div class="chatbot-header">
-            <span>Ziloy Bot</span>
+            <h4>Ziloy Bot</h4>
             <button id="closeChatbot" class="chatbot-close">&times;</button>
         </div>
         <div class="chatbot-body">
-            <p>Hola, soy Ziloy Bot. ¿En qué puedo ayudarte hoy?</p>
-            <div id="chatMessages"></div>
-            <div style="display:flex; gap:8px;">
+            <div id="chatMessages">
+                <!-- Los mensajes aparecerán aquí -->
+            </div>
+        
+            <div class="chatbot-input-area">
                 <input id="chatInput" type="text" placeholder="Escribe un mensaje..." />
                 <button id="sendMessage">Enviar</button>
             </div>
         </div>
     </div>
+
+    <footer>
+        <p>&copy; 2025 - Ziloy | UCundinamarca y UNL</p>
+    </footer>
 
     <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>

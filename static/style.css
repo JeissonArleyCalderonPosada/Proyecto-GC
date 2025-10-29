@@ -277,82 +277,24 @@ footer {
 }
 
 /* === CHATBOT FLOTANTE =============================================================================================== */
+
 .chatbot-popup {
-  display: none;
+  display: none; 
   flex-direction: column;
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 320px;
-  height: 420px;
+  width: 370px; 
+  height: 500px;
   background: #1f1f1f;
-  border: 1px solid #00c9a7;
+  border: 1px solid #0b7d73; /* Usando el color de borde de tu header */
   border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0, 201, 167, 0.3);
+  box-shadow: 0 0 25px rgba(0, 201, 167, 0.2);
   overflow: hidden;
   z-index: 2000;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.3s ease-out;
 }
 
-.chatbot-header {
-  background: #00c9a7;
-  color: #000;
-  padding: 10px 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chatbot-close {
-  background: none;
-  border: none;
-  color: #000;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.chatbot-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  color: #e6e6e6;
-  font-size: 0.95rem;
-}
-
-#chatMessages {
-  flex: 1;
-  overflow-y: auto;
-  margin-bottom: 10px;
-  padding-right: 5px;
-}
-
-#chatInput {
-  width: calc(100% - 80px);
-  padding: 8px;
-  border-radius: 6px;
-  border: none;
-  background: #2b2b2b;
-  color: #fff;
-  outline: none;
-}
-
-#sendMessage {
-  width: 60px;
-  margin-left: 8px;
-  border: none;
-  border-radius: 6px;
-  background: #00c9a7;
-  color: #000;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-#sendMessage:hover {
-  background: #00b396;
-}
-
-/* Animación de aparición */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -364,3 +306,121 @@ footer {
   }
 }
 
+.chatbot-header {
+  background: #000; 
+  border-bottom: 1px solid #0b7d73;
+  color: #00c9a7;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; /* Evita que el header se encoja */
+}
+
+.chatbot-header h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.chatbot-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+.chatbot-close:hover {
+    opacity: 1;
+}
+
+.chatbot-body {
+  flex-grow: 1; /* Ocupa el espacio restante */
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  overflow: hidden; /* Clave para que el scroll funcione bien */
+}
+
+#chatMessages {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Espacio entre mensajes */
+  color: #e6e6e6;
+  padding-right: 5px; /* Pequeño espacio para la barra de scroll */
+}
+
+/* --- ESTILOS PARA LOS MENSAJES --- */
+.msg {
+  max-width: 85%;
+  padding: 10px 15px;
+  border-radius: 18px;
+  line-height: 1.4;
+  word-wrap: break-word; 
+}
+
+.msg strong {
+    display: block;
+    font-size: 0.8em;
+    margin-bottom: 3px;
+    opacity: 0.8;
+}
+
+.user-msg {
+  background-color: #007bff; 
+  color: white;
+  align-self: flex-end; 
+  border-bottom-right-radius: 5px;
+}
+
+.bot-msg {
+  background-color: #343434; 
+  color: #e6e6e6;
+  align-self: flex-start; 
+  border-bottom-left-radius: 5px;
+}
+/* ------------------------------------------- */
+
+/* --- ÁREA DE INPUT --- */
+.chatbot-input-area {
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #343434;
+  padding-top: 15px;
+  flex-shrink: 0; /* Evita que se encoja */
+}
+
+#chatInput {
+  flex-grow: 1; /* El input ocupa todo el espacio disponible */
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: 1px solid #444;
+  background: #2b2b2b;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+#chatInput:focus {
+    border-color: #00c9a7;
+}
+
+#sendMessage {
+  padding: 0 20px;
+  border: none;
+  border-radius: 20px;
+  background: #00c9a7;
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#sendMessage:hover {
+  background: #00b396;
+}

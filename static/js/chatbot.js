@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendMessage = chatbotPopup.querySelector('#sendMessage');
 
   // Abrir ventana del chatbot
-  openBotLink.addEventListener('click', (e) => {
-    e.preventDefault();
+ openBotLink.addEventListener('click', (e) => {
+    e.preventDefault();  
     chatbotPopup.style.display = 'flex';
     chatInput.focus();
-  });
+});
 
   // Cerrar ventana
   closeChatbot.addEventListener('click', () => {
