@@ -1,7 +1,7 @@
 /* === ESTILO GENERAL === */
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #2b2b2b; /* gris oscuro suave */
+  background-color: #2b2b2b;
   color: #e6e6e6;
   margin: 0;
   padding: 0;
@@ -21,40 +21,39 @@ header {
   z-index: 1000;
 }
 
-/* contenedor del encabezado */
 .header-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* bloque del logo “Ziloy” a la izquierda */
+/* Logo "Ziloy" */
 .logo-text a {
-  color: #ffffff;               
-  text-decoration: none;       
+  color: #ffffff;
+  text-decoration: none;
   font-weight: 700;
   letter-spacing: 1px;
+  font-size: 1.8rem;
   transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .logo-text a:hover {
-  color: #f1f1f1;               
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); 
+  color: #f1f1f1;
+  text-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
-/* bloque del menú centrado */
+/* Navegación */
 nav {
-  flex: 1; 
+  flex: 1;
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   margin-left: 75px;
 }
 
-/* === NAVEGACIÓN === */
 .nav-list {
   list-style: none;
   display: flex;
-  gap: 2rem; /* separación entre opciones */
+  gap: 2rem;
   margin: 0;
   padding: 0;
 }
@@ -68,7 +67,6 @@ nav {
   padding-bottom: 4px;
 }
 
-/* Efecto hover elegante */
 .nav-list a::after {
   content: "";
   position: absolute;
@@ -90,7 +88,7 @@ nav {
   width: 100%;
 }
 
-/* botón de inicio de sesión a la derecha */
+/* Botón de inicio de sesión */
 .btn-login {
   background-color: #cfcfcf;
   color: #121212;
@@ -107,35 +105,24 @@ nav {
   transform: scale(1.05);
 }
 
-/* === CONTENEDOR DE IMAGEN === */
-.logo-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #1f1f1f;
-  padding: 2rem;
+/* === SECCIÓN PRINCIPAL === */
+.info-section {
+  background-color: #2b2b2b;
+  color: #f1f1f1;
+  padding: 4rem 2rem;
+  text-align: center;
 }
 
-.logo-container img {
-  max-width: 80%;
-  height: auto;
-  filter: brightness(0) invert(1); /* convierte el logo en blanco */
+.info-section h1 {
+  color: #00c9a7;
+  margin-bottom: 1rem;
 }
 
-/* === BOTÓN GENERAL === */
-.btn {
-  background-color: #00c9a7;
-  color: #121212;
-  padding: 0.8rem 1.8rem;
-  border-radius: 8px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  background-color: #00b396;
-  color: #ffffff;
+.info-section p {
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 /* === FOOTER === */
@@ -164,115 +151,9 @@ footer {
   .btn-login {
     margin-top: 0.5rem;
   }
-}
 
-/* === SECCIÓN DE LOGO, MISIÓN Y VISIÓN === */
-.info-section {
-  background-color: #2b2b2b; /* gris oscuro moderno */
-  color: #f1f1f1;
-  padding: 4rem 1rem;
-}
-
-.logo-main {
-  max-width: 280px;
-  height: auto;
-  margin-bottom: 2rem;
-  filter: none; /* conserva colores originales */
-  transition: transform 0.3s ease;
-}
-
-.logo-main:hover {
-  transform: scale(1.05);
-}
-
-/* Bloques de misión y visión */
-.mission-box, .vision-box {
-  background-color: #343434;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.mission-box:hover, .vision-box:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-}
-
-.mission-box h2, .vision-box h2 {
-  color: #00c9a7;
-  margin-bottom: 1rem;
-}
-
-.mission-box p, .vision-box p {
-  color: #e6e6e6;
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-/* === SECCIÓN HERO (Logo + Videos) === */
-.hero-section {
-  margin-top: 0; /* Sin espacio con el header */
-  background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
-  height: 50vh; /* Media pantalla */
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.media-box {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-}
-
-.media-content {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.85;
-  transition: opacity 0.4s ease;
-}
-
-.media-box:hover .media-content {
-  opacity: 1;
-}
-
-.logo-box {
-  position: relative;
-  z-index: 2;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
-  border-radius: 20px;
-  padding: 1.5rem;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-
-.hero-logo {
-  max-width: 70%;
-  height: auto;
-  filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
-}
-
-.logo-box:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(255,255,255,0.15);
-}
-
-/* Ajuste en pantallas pequeñas */
-@media (max-width: 768px) {
-  .hero-section {
-    height: auto;
-    flex-direction: column;
-  }
-
-  .media-box {
-    height: 200px;
-  }
-
-  .hero-logo {
-    max-width: 60%;
-    margin: 1rem 0;
+  .info-section {
+    padding: 2rem 1rem;
   }
 }
 
@@ -352,7 +233,7 @@ footer {
   background: #00b396;
 }
 
-/* Animación de aparición */
+/* Animación */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -363,4 +244,3 @@ footer {
     transform: translateY(0);
   }
 }
-

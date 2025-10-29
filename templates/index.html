@@ -1,69 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Marketing App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="index-page">
-    <header bgcolor="black">
-        <h1 align="center">
-            <b><i>Ziloy</i></b><br>
-            <small>Junto a ti</small>
-        </h1>
-        <nav>
-            <ul>
-                <li><a href="#">Acerca de Nosotros</a></li>
-                <li><a href="#">Ziloy-Bot</a></li>
-                <li><a href="#">Tienda virtual</a></li>
-                <li><a href="/login">Iniciar Sesión</a></li>
-            </ul>
-        </nav>
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="header-container">
+            <h1 class="logo-text"><a href="{{ url_for('index') }}">Ziloy</a></h1>
+            <nav>
+                <ul class="nav-list">
+                    <li><a href="{{ url_for('tienda_virtual') }}">Tienda Virtual</a></li>
+                    <li><a href="#" id="ziloyBotLink">Ziloy Bot</a></li>
+                    <li><a href="{{ url_for('conocenos') }}">Conocenos</a></li>
+                </ul>
+            </nav>
+            <a href="/login" class="btn-login">Iniciar Sesión</a>
+        </div>
     </header>
 
-    <div class="container-fluid text-center text-white" style="height: 450px;">
-        <div class="row">
-            <div class="col-md-4" style="background-color: #000000;">
-                <img src="{{ url_for('static', filename='images/ZiloyLogo.png') }}" 
-                    class="img-fluid" alt="Logo Ziloy">
-            </div>
+    <!-- SECCIÓN HERO PRINCIPAL -->
+    <section class="hero-section">
+        <div class="container-fluid p-0">
+            <div class="row g-0 align-items-center justify-content-center">
 
-            <!-- Visión -->
-            <div class="col-md-4" style="background-color: #0b7d73;">
-            <h2>VISIÓN</h2>
-            <p>
-                Para el año 2030, la empresa será reconocida en Cundinamarca como un referente en soluciones de protección de datos 
-                y cumplimiento normativo para PYMES, destacándose por su innovación, confianza y compromiso en la implementación 
-                de estrategias efectivas de seguridad de la información.
-            </p>
-            </div>
+                <!-- Video o imagen izquierda -->
+                <div class="col-md-4 media-box">
+                    <video autoplay muted loop class="media-content">
+                        <source src="{{ url_for('static', filename='videos/product_left.mp4') }}" type="video/mp4">
+                    </video>
+                </div>
 
-            <!-- Valores -->
-            <div class="col-md-4 p-4" style="background-color: #09695f;">
-            <h2>VALORES</h2>
-            <p>
-                Compromiso, responsabilidad, innovación y respeto por la privacidad de los datos son los pilares que guían nuestras acciones 
-                hacia la excelencia y la confianza de nuestros clientes.
-            </p>
+                <!-- Logo central -->
+                <div class="col-md-4 text-center logo-box">
+                    <img src="{{ url_for('static', filename='images/ZiloyLogo.png') }}" alt="Logo Ziloy"
+                        class="hero-logo">
+                </div>
+
+                <!-- Video o imagen derecha -->
+                <div class="col-md-4 media-box">
+                    <video autoplay muted loop class="media-content">
+                        <source src="{{ url_for('static', filename='videos/product_right.mp4') }}" type="video/mp4">
+                    </video>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN MISIÓN Y VISIÓN -->
+    <section class="info-section text-white text-center py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-5 mission-box p-4 mx-2">
+                    <h2>MISIÓN</h2>
+                    <p>
+                        En Ziloy, nos dedicamos a innovar en la experiencia de disfrutar bebidas calientes en cualquier
+                        momento y lugar. Diseñamos bolsas térmicas digitales que combinan tecnología inteligente,
+                        sostenibilidad
+                        y estilo, ofreciendo soluciones prácticas y ecológicas que acompañan la rutina diaria de
+                        nuestros usuarios,
+                        mientras promovemos un consumo energético responsable.
+                    </p>
+                </div>
+
+                <div class="col-md-5 vision-box p-4 mx-2">
+                    <h2>VISIÓN</h2>
+                    <p>
+                        Ser una marca líder en Latinoamérica en productos térmicos inteligentes y sostenibles,
+                        reconocida por su compromiso con la calidad, la innovación y el cuidado del planeta.
+                        Aspiramos a transformar la forma en que las personas disfrutan sus momentos cotidianos,
+                        manteniendo siempre el equilibrio entre funcionalidad, diseño y responsabilidad ambiental.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 - Ziloy | UCundinamarca y UNL</p>
+    </footer>
+
+    <!-- Ventana flotante del Chatbot -->
+    <div id="chatbotPopup" class="chatbot-popup">
+        <div class="chatbot-header">
+            <h4>Ziloy Bot</h4>
+            <button id="closeChatbot" class="chatbot-close">&times;</button>
+        </div>
+        <div class="chatbot-body">
+            <p>Hola, soy Ziloy Bot. ¿En qué puedo ayudarte hoy?</p>
+            <div id="chatMessages"></div>
+            <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." />
+            <button id="sendMessage">Enviar</button>
+        </div>
+    </div>
+
+    <div id="chatbotPopup" class="chatbot-popup" style="display:none;">
+        <div class="chatbot-header">
+            <span>Ziloy Bot</span>
+            <button id="closeChatbot" class="chatbot-close">&times;</button>
+        </div>
+        <div class="chatbot-body">
+            <div id="chatMessages"></div>
+            <div style="display:flex; gap:8px;">
+                <input id="chatInput" type="text" placeholder="Escribe un mensaje..." />
+                <button id="sendMessage">Enviar</button>
             </div>
         </div>
     </div>
 
-    <main>
-        <section>
-            <h2>ZILOY</h2>
-            <p>
-                Bolsa termica reutilizable de alta calidad, perfecta para mantener tus bebidas frescas.
-            </p>
-            <a href="/login" class="btn">Comenzar</a>
-        </section>
-    </main>
 
-    <footer>
-        <p>&copy; 2025 - UCundinamarca y UNL </p>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

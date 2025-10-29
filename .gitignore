@@ -1,0 +1,24 @@
+# Entorno virtual
+venv/
+.env
+
+# Claves API o configuraciones locales
+*.env
+*.key
+__pycache__/
+*.pyc
+
+# Archivos de base de datos 
+*.db
+*.sqlite3
+
+# Archivos temporales
+*.log
+.DS_Store
+
+# Configuración de VSCode o PyCharm
+.vscode/
+.idea/
+
+# Archivos de Flask cache
+instance/

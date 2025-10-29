@@ -73,6 +73,16 @@ def dashboard():
         return redirect(url_for('login'))
     return render_template('dashboard.html', user_name=session.get('user_name'))
 
+# Ruta de la página "Conocenos"
+@app.route('/conocenos')
+def conocenos():
+    return render_template('conocenos.html')
+
+# Ruta de la página "Tienda Virtual"
+@app.route('/tiendavirtual')
+def tienda_virtual():
+    return render_template('tiendavirtual.html')
+
 # Ruta para registrar nuevos usuarios
 @app.route('/register', methods=['GET', 'POST'])
 def register():
