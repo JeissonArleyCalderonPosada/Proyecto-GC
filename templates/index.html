@@ -29,27 +29,22 @@
     <section class="hero-section">
         <div class="container-fluid p-0">
             <div class="row g-0 align-items-center justify-content-center">
-
-                <!-- Video o imagen izquierda -->
                 <div class="col-md-4 media-box">
                     <video autoplay muted loop class="media-content">
                         <source src="{{ url_for('static', filename='videos/product_left.mp4') }}" type="video/mp4">
                     </video>
                 </div>
 
-                <!-- Logo central -->
                 <div class="col-md-4 text-center logo-box">
                     <img src="{{ url_for('static', filename='images/ZiloyLogo.png') }}" alt="Logo Ziloy"
                         class="hero-logo">
                 </div>
 
-                <!-- Video o imagen derecha -->
                 <div class="col-md-4 media-box">
                     <video autoplay muted loop class="media-content">
                         <source src="{{ url_for('static', filename='videos/product_right.mp4') }}" type="video/mp4">
                     </video>
                 </div>
-
             </div>
         </div>
     </section>
@@ -88,25 +83,13 @@
     </footer>
 
     <!-- Ventana flotante del Chatbot -->
-    <div id="chatbotPopup" class="chatbot-popup">
-        <div class="chatbot-header">
-            <h4>Ziloy Bot</h4>
-            <button id="closeChatbot" class="chatbot-close">&times;</button>
-        </div>
-        <div class="chatbot-body">
-            <p>Hola, soy Ziloy Bot. ¿En qué puedo ayudarte hoy?</p>
-            <div id="chatMessages"></div>
-            <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." />
-            <button id="sendMessage">Enviar</button>
-        </div>
-    </div>
-
     <div id="chatbotPopup" class="chatbot-popup" style="display:none;">
         <div class="chatbot-header">
             <span>Ziloy Bot</span>
             <button id="closeChatbot" class="chatbot-close">&times;</button>
         </div>
         <div class="chatbot-body">
+            <p>Hola, soy Ziloy Bot. ¿En qué puedo ayudarte hoy?</p>
             <div id="chatMessages"></div>
             <div style="display:flex; gap:8px;">
                 <input id="chatInput" type="text" placeholder="Escribe un mensaje..." />
@@ -115,9 +98,7 @@
         </div>
     </div>
 
-
     <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
