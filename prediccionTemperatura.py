@@ -7,7 +7,7 @@ import re
 # ========================
 # CARGAR Y ENTRENAR MODELO
 # ========================
-df = pd.read_excel("dataset_bebidas_enfriamiento.xlsx")
+df = pd.read_excel("DatasetBebidasEnfriamiento.xlsx")
 
 X = df[["Tipo de bebida", "Temperatura inicial (°C)", "Temperatura ambiente (°C)"]]
 y = df["Tiempo estimado para alcanzar temperatura fría (min)"]
