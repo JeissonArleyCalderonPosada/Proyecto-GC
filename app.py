@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import openai
 import os
 import logging
+from preguntasFrecuentes import obtener_respuesta
 
 logging.basicConfig(level=logging.INFO)
 
@@ -113,25 +114,12 @@ def register():
 def chat():
     data = request.get_json(force=True)
     user_message = data.get("message", "")
+    
     if not user_message:
         return jsonify({"error": "El mensaje está vacío"}), 400
 
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Eres ZiloyBot, asistente amable y profesional de la marca Ziloy."},
-                {"role": "user", "content": user_message}
-            ],
-            max_tokens=500,
-            temperature=0.6
-        )
-        bot_reply = response.choices[0].message.content.strip()
-        return jsonify({"reply": bot_reply})
-    except Exception as e:
-        logging.exception("Error llamando a OpenAI")
-        return jsonify({"error": "Error en servidor del chatbot"}), 500
-    
+    respuesta = obtener_respuesta(user_message)
+    return jsonify({"reply": respuesta})
 
 # ===== RUTA DE PREDICCIÓN =====
 @app.route("/prediccion", methods=["POST"])

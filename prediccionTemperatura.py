@@ -21,32 +21,86 @@ modelo.fit(X, y)
 print("✅ Modelo de predicción cargado correctamente.")
 
 # ========================
+# VARIABLES DE CONVERSACIÓN
+# ========================
+estado_conversacion = {
+    "etapa": None,
+    "bebida": None,
+    "temp_inicial": None,
+    "temp_ambiente": None
+}
+
+# ========================
 # FUNCIÓN DE PREDICCIÓN
 # ========================
 def predecir_tiempo(mensaje_usuario: str) -> str:
     """
-    Recibe un mensaje como:
-    'Tengo una cerveza a 30 grados y el ambiente está a 20'
-    y devuelve el tiempo estimado de enfriamiento.
+    Guía al usuario paso a paso para obtener la predicción.
     """
-    mensaje = mensaje_usuario.lower()
+    global estado_conversacion
+    mensaje = mensaje_usuario.lower().strip()
 
-    # Detectar bebida
-    bebidas = list(encoder.classes_)
-    bebida = next((b for b in bebidas if b.lower() in mensaje), None)
+    # Si es el primer mensaje o no hay etapa activa, inicia directamente
+    if not mensaje or estado_conversacion["etapa"] is None:
+        estado_conversacion["etapa"] = "bebida"
+        return "¿Qué tipo de bebida deseas analizar? (ejemplo: café, té, cerveza...)"
 
-    # Buscar números en el texto
-    nums = re.findall(r"\d+", mensaje)
-    temps = [int(n) for n in nums]
+    # Reiniciar si el usuario quiere hacer otra predicción
+    if "otra" in mensaje or "nuevo" in mensaje or "reiniciar" in mensaje:
+        estado_conversacion = {
+            "etapa": "bebida",
+            "bebida": None,
+            "temp_inicial": None,
+            "temp_ambiente": None
+        }
+        return "Perfecto, Empecemos de nuevo. ¿Qué bebida deseas analizar?"
 
-    if not bebida or len(temps) < 2:
-        return "Por favor, dime la bebida, su temperatura inicial y la temperatura ambiente. Ejemplo: 'Una cerveza a 25 grados con ambiente a 18'."
+    # Etapa 1: bebida
+    if estado_conversacion["etapa"] == "bebida":
+        bebidas = list(encoder.classes_)
+        bebida = next((b for b in bebidas if b.lower() in mensaje), None)
 
-    temp_inicial = temps[0]
-    temp_ambiente = temps[1]
+        if not bebida:
+            return f"No reconozco esa bebida. Prueba con una de estas: {', '.join(bebidas)}."
 
-    # Preparar entrada para el modelo
-    entrada = [[encoder.transform([bebida])[0], temp_inicial, temp_ambiente]]
-    prediccion = modelo.predict(entrada)[0]
+        estado_conversacion["bebida"] = bebida
+        estado_conversacion["etapa"] = "temp_inicial"
+        return f"Perfecto. ¿Cuál es la temperatura inicial de tu {bebida}? (en °C)"
 
-    return f"Tu {bebida} alcanzará temperatura fría en aproximadamente {prediccion:.1f} minutos."
+    # Etapa 2: temperatura inicial
+    if estado_conversacion["etapa"] == "temp_inicial":
+        nums = re.findall(r"\d+", mensaje)
+        if not nums:
+            return "Por favor, indícame un número para la temperatura inicial en °C."
+        estado_conversacion["temp_inicial"] = int(nums[0])
+        estado_conversacion["etapa"] = "temp_ambiente"
+        return "Gracias. Ahora, podrias revisar la temperatura ambiente en tu celular e indicarmela (en °C)."
+
+    # Etapa 3: temperatura ambiente → calcular predicción
+    if estado_conversacion["etapa"] == "temp_ambiente":
+        nums = re.findall(r"\d+", mensaje)
+        if not nums:
+            return "Por favor, indícame un número para la temperatura ambiente en °C."
+
+        estado_conversacion["temp_ambiente"] = int(nums[0])
+        estado_conversacion["etapa"] = "resultado"
+
+        bebida = estado_conversacion["bebida"]
+        temp_inicial = estado_conversacion["temp_inicial"]
+        temp_ambiente = estado_conversacion["temp_ambiente"]
+
+        entrada = [[encoder.transform([bebida])[0], temp_inicial, temp_ambiente]]
+        prediccion = modelo.predict(entrada)[0]
+
+        estado_conversacion["etapa"] = "fin"
+
+        return (
+            f"Tu {bebida} alcanzará temperatura fría en aproximadamente {prediccion:.1f} minutos.\n\n"
+            "¿Quieres hacer otra predicción? (escribe 'otra' o 'nuevo' para reiniciar)"
+        )
+
+    # Si ya terminó
+    if estado_conversacion["etapa"] == "fin":
+        return "¿Quieres hacer otra predicción? Escribe 'otra' o 'nuevo' para comenzar de nuevo."
+
+    return "No entendí eso. Intenta escribiendo 'otra' para comenzar de nuevo."
