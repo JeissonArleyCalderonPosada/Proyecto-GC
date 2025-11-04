@@ -136,13 +136,13 @@ def chat():
 # ===== RUTA DE PREDICCIÓN =====
 @app.route("/prediccion", methods=["POST"])
 def prediccion():
-    data = request.get_json(force=True)
-    user_message = data.get("message", "")
+    data = request.get_json()
+    mensaje = data.get("message", "")
     try:
-        resultado = predecir_tiempo(user_message)  # Llama el modelo
-        return jsonify({"reply": f"Según el modelo, tu bebida tardará aproximadamente {resultado} minutos en enfriarse."})
+        resultado = predecir_tiempo(mensaje)
+        return jsonify({"reply": resultado})
     except Exception as e:
-        return jsonify({"reply": f"Ocurrió un error procesando la predicción: {str(e)}"})
+        return jsonify({"reply": f"Ocurrió un error en la predicción: {str(e)}"})
 
 # ===== INICIAR SERVIDOR =====
 if __name__ == '__main__':
