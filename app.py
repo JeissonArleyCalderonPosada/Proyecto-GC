@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from prediccionTemperatura import predecir_tiempo
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -130,6 +131,18 @@ def chat():
     except Exception as e:
         logging.exception("Error llamando a OpenAI")
         return jsonify({"error": "Error en servidor del chatbot"}), 500
+    
+
+# ===== RUTA DE PREDICCIÓN =====
+@app.route("/prediccion", methods=["POST"])
+def prediccion():
+    data = request.get_json(force=True)
+    user_message = data.get("message", "")
+    try:
+        resultado = predecir_tiempo(user_message)  # Llama el modelo
+        return jsonify({"reply": f"Según el modelo, tu bebida tardará aproximadamente {resultado} minutos en enfriarse."})
+    except Exception as e:
+        return jsonify({"reply": f"Ocurrió un error procesando la predicción: {str(e)}"})
 
 # ===== INICIAR SERVIDOR =====
 if __name__ == '__main__':

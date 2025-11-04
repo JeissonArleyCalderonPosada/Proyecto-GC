@@ -424,3 +424,26 @@ footer {
 #sendMessage:hover {
   background: #00b396;
 }
+
+
+
+/* --- BOTONES DE CHATBOT --- */
+.bot-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.option-btn {
+  background-color: #0078d7;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.option-btn:hover {
+  background-color: #005fa3;
+}
