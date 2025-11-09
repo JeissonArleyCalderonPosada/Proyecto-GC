@@ -18,7 +18,7 @@ X["Tipo de bebida"] = encoder.fit_transform(X["Tipo de bebida"])
 modelo = RandomForestRegressor(n_estimators=200, random_state=42)
 modelo.fit(X, y)
 
-print("✅ Modelo de predicción cargado correctamente.")
+print(" Modelo de predicción cargado correctamente.")
 
 # ========================
 # VARIABLES DE CONVERSACIÓN
