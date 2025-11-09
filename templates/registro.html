@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,13 +21,13 @@
 
     <!-- Mensajes Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for category, msg in messages %}
-            <div class="flash {{ category }}">{{ msg }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, msg in messages %}
+        <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     <main>
@@ -37,6 +38,12 @@
                     <label for="nombre">Nombre completo</label>
                     <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
                 </div>
+
+                <div class="form-group">
+                    <label for="telefono">Teléfono (opcional)</label>
+                    <input type="text" id="telefono" name="telefono" placeholder="Ej. 3105555555">
+                </div>
+
 
                 <div class="form-group">
                     <label for="correo">Correo electrónico</label>
@@ -63,4 +70,5 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
