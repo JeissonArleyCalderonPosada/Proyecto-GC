@@ -276,7 +276,7 @@ footer {
   }
 }
 
-/* === CHATBOT FLOTANTE =============================================================================================== */
+/* === CHATBOT FLOTANTE  */
 
 .chatbot-popup {
   display: none; 
@@ -314,7 +314,7 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0; /* Evita que el header se encoja */
+  flex-shrink: 0; 
 }
 
 .chatbot-header h4 {
@@ -338,11 +338,11 @@ footer {
 }
 
 .chatbot-body {
-  flex-grow: 1; /* Ocupa el espacio restante */
+  flex-grow: 1; 
   display: flex;
   flex-direction: column;
   padding: 15px;
-  overflow: hidden; /* Clave para que el scroll funcione bien */
+  overflow: hidden; 
 }
 
 #chatMessages {
@@ -351,9 +351,9 @@ footer {
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Espacio entre mensajes */
+  gap: 12px; 
   color: #e6e6e6;
-  padding-right: 5px; /* Pequeño espacio para la barra de scroll */
+  padding-right: 5px; 
 }
 
 /* --- ESTILOS PARA LOS MENSAJES --- */
@@ -393,11 +393,11 @@ footer {
   gap: 10px;
   border-top: 1px solid #343434;
   padding-top: 15px;
-  flex-shrink: 0; /* Evita que se encoja */
+  flex-shrink: 0; 
 }
 
 #chatInput {
-  flex-grow: 1; /* El input ocupa todo el espacio disponible */
+  flex-grow: 1; 
   padding: 10px 15px;
   border-radius: 20px;
   border: 1px solid #444;
@@ -424,8 +424,6 @@ footer {
 #sendMessage:hover {
   background: #00b396;
 }
-
-
 
 /* --- BOTONES DE CHATBOT --- */
 .bot-options {
