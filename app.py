@@ -7,6 +7,7 @@ import openai
 import os
 import logging
 from preguntasFrecuentes import obtener_respuesta
+from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,12 +15,13 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = "clave_super_segura"
 
-# Configuración de la base de datos
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    "mssql+pyodbc://DESKTOP-PTOBCHL\\SQLEXPRESS/ml_project_aulaespejo?"
-    "driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
-)
+#Configuracion de la base de datos
+load_dotenv()  # carga las variables del archivo .env
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
 # Configuración de OpenAI
@@ -27,19 +29,36 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 if not openai.api_key:
     logging.warning("OPENAI_API_KEY no encontrada.")
 
-# ===== MODELO DE USUARIO =====
+# ===== MODELOS DE BASE DE DATOS =====
 class Usuario(db.Model):
-    __tablename__ = 'Usuarios'
+    __tablename__ = 'usuarios'
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     correo = db.Column(db.String(120), unique=True, nullable=False)
+    telefono = db.Column(db.String(20))  # pedidos vía WhatsApp
     password_hash = db.Column(db.String(512), nullable=False)
+
+    pedidos = db.relationship('Pedido', backref='usuario', lazy=True)
 
     def __repr__(self):
         return f'<Usuario {self.nombre}>'
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class Pedido(db.Model):
+    __tablename__ = 'pedidos'
+    id = db.Column(db.Integer, primary_key=True)
+    producto = db.Column(db.String(100), nullable=False)
+    metodo_pago = db.Column(db.String(50))
+    direccion = db.Column(db.String(200))
+    estado = db.Column(db.String(50), default="pendiente")
+
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Pedido {self.producto} - Estado: {self.estado}>'
 
 # ===== RUTAS DE LA WEB =====
 @app.route('/')
@@ -59,6 +78,7 @@ def login():
     if request.method == 'POST':
         correo = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
+
         usuario = Usuario.query.filter_by(correo=correo).first()
 
         if usuario and usuario.check_password(password):
@@ -67,7 +87,7 @@ def login():
             flash('Inicio de sesión exitoso', 'success')
             return redirect(url_for('dashboard'))
         else:
-            flash('Datos incorrectos', 'error')
+            flash('Datos incorrectos o usuario no encontrado.', 'error')
             return redirect(url_for('login'))
 
     return render_template('login.html')
@@ -89,18 +109,27 @@ def register():
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
         correo = request.form.get('correo', '').strip().lower()
-        password = request.form.get('password', '')
+        password = request.form.get('password', '').strip()
+        telefono = request.form.get('telefono', '').strip() if 'telefono' in request.form else None
 
+        # Validar campos
         if not nombre or not correo or not password:
             flash("Por favor completa todos los campos.", "error")
             return redirect(url_for('register'))
 
+        # Verificar si el correo ya existe
         if Usuario.query.filter_by(correo=correo).first():
             flash("El correo ya está registrado.", "error")
             return redirect(url_for('register'))
 
+        # Crear usuario
         password_hash = generate_password_hash(password)
-        nuevo_usuario = Usuario(nombre=nombre, correo=correo, password_hash=password_hash)
+        nuevo_usuario = Usuario(
+            nombre=nombre,
+            correo=correo,
+            telefono=telefono,
+            password_hash=password_hash
+        )
         db.session.add(nuevo_usuario)
         db.session.commit()
 
