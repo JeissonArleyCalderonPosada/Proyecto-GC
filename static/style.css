@@ -539,11 +539,11 @@ footer {
   flex-direction: column;
   text-align: center;
   height: 400px;
-  width: 400px;
+  width: 335px;
   border-radius: 10px;
   color: white;
   cursor: pointer;
-  transition: 400ms;
+  transition: 200ms;
 }
 
 .cards .card p.second-text {
@@ -633,4 +633,94 @@ footer {
 
 .btn-qty:hover {
   color: #007f6e;
+}
+
+/* PÁGINA DE REGISTRO */
+.register-page {
+  background-color: #1f1f1f;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.register-container {
+  background-color: #2b2b2b;
+  color: #f1f1f1;
+  width: 90%;
+  max-width: 450px;
+  margin: 4rem auto;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.register-container h2 {
+  color: #00c9a7;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #1f1f1f;
+  color: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  border-color: #00c9a7;
+  outline: none;
+}
+
+.flash-messages {
+  width: 90%;
+  max-width: 450px;
+  margin: 1rem auto;
+}
+
+.flash {
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.flash.success {
+  background-color: #00c9a7;
+  color: #000;
+}
+
+.flash.error {
+  background-color: #b30000;
+  color: #fff;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.login-link a {
+  color: #00c9a7;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
 }
