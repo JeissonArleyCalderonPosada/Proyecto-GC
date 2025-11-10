@@ -6,8 +6,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import openai
 import os
 import logging
+from flask import session
+from functools import wraps
 from preguntasFrecuentes import obtener_respuesta
 from dotenv import load_dotenv
+from twilio.twiml.messaging_response import MessagingResponse
 
 logging.basicConfig(level=logging.INFO)
 
@@ -37,8 +40,7 @@ class Usuario(db.Model):
     correo = db.Column(db.String(120), unique=True, nullable=False)
     telefono = db.Column(db.String(20))  # pedidos vía WhatsApp
     password_hash = db.Column(db.String(512), nullable=False)
-
-    pedidos = db.relationship('Pedido', backref='usuario', lazy=True)
+    pedidos = db.relationship('Pedido', backref='cliente', lazy=True)
 
     def __repr__(self):
         return f'<Usuario {self.nombre}>'
@@ -50,15 +52,31 @@ class Usuario(db.Model):
 class Pedido(db.Model):
     __tablename__ = 'pedidos'
     id = db.Column(db.Integer, primary_key=True)
-    producto = db.Column(db.String(100), nullable=False)
+    color = db.Column(db.String(50), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    precio_total = db.Column(db.Float, nullable=False)
     metodo_pago = db.Column(db.String(50))
     direccion = db.Column(db.String(200))
     estado = db.Column(db.String(50), default="pendiente")
 
+    # Relación con usuarios
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
 
     def __repr__(self):
-        return f'<Pedido {self.producto} - Estado: {self.estado}>'
+        return f'<Pedido Usuario:{self.usuario_id} - Estado:{self.estado}>'
+    
+class Admin(db.Model):
+    __tablename__ = 'admins'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    correo = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(512), nullable=False)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def __repr__(self):
+        return f'<Admin {self.correo}>'
 
 # ===== RUTAS DE LA WEB =====
 @app.route('/')
@@ -138,6 +156,9 @@ def register():
 
     return render_template('registro.html')
 
+
+
+
 # ===== RUTA DE CHATBOT =====
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -160,6 +181,56 @@ def prediccion():
         return jsonify({"reply": resultado})
     except Exception as e:
         return jsonify({"reply": f"Ocurrió un error en la predicción: {str(e)}"})
+    
+# ===== RUTA CHATBOT WHATSAPP =====
+@app.route("/whatsapp", methods=["POST"])
+def whatsapp_bot():
+    from flask import request
+    mensaje_usuario = request.form.get('Body', '').strip().lower()
+    numero_usuario = request.form.get('From', '').replace('whatsapp:', '')
+
+    resp = MessagingResponse()
+    msg = resp.message()
+
+    # Buscar usuario en base de datos
+    usuario = Usuario.query.filter_by(correo='cliente@ejemplo.com').first()  # puedes cambiar esto si ya se guarda el correo o número
+    if not usuario:
+        msg.body("⚠️ No estás registrado en Ziloy. Por favor regístrate primero en la web.")
+        return str(resp)
+
+    pedido = Pedido.query.filter_by(telefono=numero_usuario, estado="pendiente").first()
+
+    if "hola" in mensaje_usuario:
+        msg.body(f"👋 ¡Hola {usuario.nombre}! Soy el asistente de Ziloy.\n\n¿De qué color deseas tu producto?")
+    elif not pedido:
+        nuevo_pedido = Pedido(nombre_cliente=usuario.nombre, telefono=numero_usuario, usuario_id=usuario.id)
+        db.session.add(nuevo_pedido)
+        db.session.commit()
+        msg.body("¿Qué color prefieres para tu producto?")
+    elif pedido and not pedido.color:
+        pedido.color = mensaje_usuario.title()
+        db.session.commit()
+        msg.body("¿Cuántas unidades deseas?")
+    elif pedido and pedido.color and not pedido.cantidad:
+        try:
+            pedido.cantidad = int(mensaje_usuario)
+            pedido.precio_total = pedido.cantidad * 25000  # ejemplo: cada producto vale 25,000
+            db.session.commit()
+            msg.body("¿Qué método de pago usarás? (Nequi, tarjeta, efectivo)")
+        except ValueError:
+            msg.body("Por favor ingresa un número válido para la cantidad.")
+    elif pedido and not pedido.metodo_pago:
+        pedido.metodo_pago = mensaje_usuario.title()
+        db.session.commit()
+        msg.body("Perfecto 🧾 Envíame tu dirección de entrega 🏠")
+    elif pedido and not pedido.direccion:
+        pedido.direccion = mensaje_usuario.title()
+        db.session.commit()
+        msg.body("✅ ¡Gracias! Tu pedido ha sido registrado.\nEsperando confirmación de la dueña del negocio.")
+    else:
+        msg.body("No entendí 😅. Por favor, empieza diciendo *Hola*.")
+
+    return str(resp)
 
 # ===== INICIAR SERVIDOR =====
 if __name__ == '__main__':
