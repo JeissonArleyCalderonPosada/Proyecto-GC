@@ -18,7 +18,7 @@
                 <ul class="nav-list">
                     <li><a href="{{ url_for('tienda_virtual') }}">Tienda Virtual</a></li>
                     <li><a href="#" id="ziloyBotLink">Ziloy Bot</a></li>
-                    <li><a href="{{ url_for('conocenos') }}">Conocenos</a></li>
+                    <li><a href="{{ url_for('conocenos') }}">Sobre Nosotros</a></li>
                 </ul>
             </nav>
             <a href="/login" class="btn-login">Iniciar Sesión</a>
@@ -49,35 +49,6 @@
         </div>
     </section>
 
-    <!-- SECCIÓN MISIÓN Y VISIÓN -->
-    <section class="info-section text-white text-center py-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-5 mission-box p-4 mx-2">
-                    <h2>MISIÓN</h2>
-                    <p>
-                        En Ziloy, nos dedicamos a innovar en la experiencia de disfrutar bebidas calientes en cualquier
-                        momento y lugar. Diseñamos bolsas térmicas digitales que combinan tecnología inteligente,
-                        sostenibilidad
-                        y estilo, ofreciendo soluciones prácticas y ecológicas que acompañan la rutina diaria de
-                        nuestros usuarios,
-                        mientras promovemos un consumo energético responsable.
-                    </p>
-                </div>
-
-                <div class="col-md-5 vision-box p-4 mx-2">
-                    <h2>VISIÓN</h2>
-                    <p>
-                        Ser una marca líder en Latinoamérica en productos térmicos inteligentes y sostenibles,
-                        reconocida por su compromiso con la calidad, la innovación y el cuidado del planeta.
-                        Aspiramos a transformar la forma en que las personas disfrutan sus momentos cotidianos,
-                        manteniendo siempre el equilibrio entre funcionalidad, diseño y responsabilidad ambiental.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Ventana flotante del Chatbot -->
     <div id="chatbotPopup" class="chatbot-popup">
         <div class="chatbot-header">
@@ -95,6 +66,97 @@
             </div>
         </div>
     </div>
+
+
+    <!-- SECCIÓN DE CARACTERÍSTICAS -->
+    <section class="features-section py-5 text-center">
+        <div class="container">
+            <h2 class="section-title mb-4 text-uppercase fw-bold" style="color:#00c9a7;">Características Destacadas</h2>
+            <div class="row g-4 justify-content-center">
+                
+                <!-- From Uiverse.io by PriyanshuGupta28 --> 
+                <div class="marquee">
+                    <div class="marquee__inner">
+                        <div class="marquee__group">
+                            <span>🌡️ Temperatura en Tiempo Real</span>
+                            <span>🌿 Material Ecológico</span>
+                            <span>🔥 Alta Retención Térmica</span>
+                            <span>🔋 Batería Duradera</span>
+                            <span>🌎 Amigable con el Medio Ambiente</span>
+                            <span>♻️ Segundas Oportunidades para el Planeta</span>
+                        </div>
+                        
+                        <div class="marquee__group">
+                            <span>🌡️ Temperatura en Tiempo Real</span>
+                            <span>🌿 Material Ecológico</span>
+                            <span>🔥 Alta Retención Térmica</span>
+                            <span>🔋 Batería Duradera</span>
+                            <span>🌎 Amigable con el Medio Ambiente</span>
+                            <span>♻️ Segundas Oportunidades para el Planeta</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN CÓMO FUNCIONA -->
+    <section class="how-it-works py-5">
+        <div class="container text-center">
+            <h2 class="section-title mb-5 text-uppercase fw-bold" style="color:#00c9a7;">¿Cómo Funciona Ziloy?</h2>
+            <div class="cards">
+                <div class="card color">
+                    <p class="step-number">1</p>
+                    <p class="second-text">Llena tu bolsa térmica con la bebida deseada.</p>
+                </div>
+                <div class="card color">
+                    <p class="step-number">2</p>
+                    <p class="second-text">La pantalla digital muestra la temperatura en segundos.</p>
+                </div>
+                <div class="card color">
+                    <p class="step-number">3</p>
+                    <p class="second-text">Disfruta tu bebida perfecta, siempre a la temperatura ideal.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN TESTIMONIOS -->
+    <section class="testimonials py-5 text-center">
+        <div class="container">
+            <h2 class="section-title mb-4 text-uppercase fw-bold" style="color:#00c9a7;">Lo Que Dicen Nuestros Usuarios</h2>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="testimonial-box p-4">
+                        <p>“Desde que tengo mi Ziloy, mis cafés se mantienen calientes por horas. ¡Increíble diseño!”</p>
+                        <h6>- Laura Gómez</h6>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-box p-4">
+                        <p>“Perfecta para mis caminatas. Sé exactamente cuándo mi bebida está lista para tomar.”</p>
+                        <h6>- Andrés Ruiz</h6>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-box p-4">
+                        <p>“Tecnología útil y diseño moderno. Definitivamente recomiendo Ziloy.”</p>
+                        <h6>- Daniela Torres</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN LLAMADA A LA ACCIÓN -->
+    <section class="cta-section text-center py-5">
+        <div class="container">
+            <h2 class="mb-3">¿Listo para experimentar Ziloy?</h2>
+            <a href="{{ url_for('tienda_virtual') }}" class="btn btn-lg mt-3">Comprar Ahora</a>
+        </div>
+    </section>
+
 
     <footer>
         <p>&copy; 2025 - Ziloy | UCundinamarca y UNL</p>
