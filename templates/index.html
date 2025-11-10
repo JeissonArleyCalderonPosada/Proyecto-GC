@@ -10,7 +10,6 @@
 </head>
 
 <body class="index-page">
-    <!-- ENCABEZADO -->
     <header>
         <div class="header-container">
             <h1 class="logo-text"><a href="{{ url_for('index') }}">Ziloy</a></h1>
@@ -21,11 +20,15 @@
                     <li><a href="{{ url_for('conocenos') }}">Sobre Nosotros</a></li>
                 </ul>
             </nav>
-            <a href="/login" class="btn-login">Iniciar Sesión</a>
+            {% if 'user_id' in session %}
+                <a href="{{ url_for('logout') }}" class="btn-login">Cerrar Sesión</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Iniciar Sesión</a>
+            {% endif %}
         </div>
     </header>
 
-    <!-- SECCIÓN HERO PRINCIPAL -->
+    <!-- SECCIÓN PRINCIPAL -->
     <section class="hero-section">
         <div class="container-fluid p-0">
             <div class="row g-0 align-items-center justify-content-center">
@@ -104,19 +107,27 @@
     <!-- SECCIÓN CÓMO FUNCIONA -->
     <section class="how-it-works py-5">
         <div class="container text-center">
-            <h2 class="section-title mb-5 text-uppercase fw-bold" style="color:#00c9a7;">¿Cómo Funciona Ziloy?</h2>
-            <div class="cards">
-                <div class="card color">
-                    <p class="step-number">1</p>
-                    <p class="second-text">Llena tu bolsa térmica con la bebida deseada.</p>
+            <div class="row align-items-center justify-content-center">
+                <div class="col-md-6">
+                    <div class="cards">
+                        <div class="card color mb-1">
+                            <p class="step-number">1</p>
+                            <p class="second-text">Llena tu bolsa térmica con la bebida deseada.</p>
+                        </div>
+                        <div class="card color mb-3">
+                            <p class="step-number">2</p>
+                            <p class="second-text">La pantalla digital muestra la temperatura en segundos.</p>
+                        </div>
+                        <div class="card color">
+                            <p class="step-number">3</p>
+                            <p class="second-text">Disfruta tu bebida perfecta, siempre a la temperatura ideal.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card color">
-                    <p class="step-number">2</p>
-                    <p class="second-text">La pantalla digital muestra la temperatura en segundos.</p>
-                </div>
-                <div class="card color">
-                    <p class="step-number">3</p>
-                    <p class="second-text">Disfruta tu bebida perfecta, siempre a la temperatura ideal.</p>
+                <div class="col-md-6" style="height: 400px; overflow: hidden;">
+                    <video autoplay muted loop class="w-100 h-100 object-fit-cover rounded shadow">
+                        <source src="{{ url_for('static', filename='videos/product_left.mp4') }}" type="video/mp4">
+                    </video>
                 </div>
             </div>
         </div>

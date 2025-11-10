@@ -20,52 +20,60 @@
                     <li><a href="{{ url_for('conocenos') }}">Sobre Nosotros</a></li>
                 </ul>
             </nav>
-            <a href="/login" class="btn-login">Iniciar Sesión</a>
+            {% if 'user_id' in session %}
+                <a href="{{ url_for('logout') }}" class="btn-login">Cerrar Sesión</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Iniciar Sesión</a>
+            {% endif %}
         </div>
     </header>
 
-    <main class="text-center py-1">
-        <h2 class="mb-4" style="color:#00c9a7;">Tienda Virtual</h2>
-        <p class="lead" style="max-width: 800px; margin: auto;">
-            Explora nuestra tienda virtual y descubre productos innovadores diseñados para
-            mejorar tu día a día. Calidad, sostenibilidad y tecnología al alcance de tu mano.
-        </p>
-    </main>
+    <section class="how-it-works py-5">
+        <main class="text-center py-1">
+            <h2 class="mb-4" style="color:#00c9a7;">Tienda Virtual</h2>
+            <p class="lead" style="max-width: 800px; margin: auto;">
+                Explora nuestra tienda virtual y descubre productos innovadores diseñados para
+                mejorar tu día a día. Calidad, sostenibilidad y tecnología al alcance de tu mano.
+            </p>
+        </main>
+    </section>
 
     <!-- === SECCIÓN TIENDA VIRTUAL === -->
-    <section class="store-section py-5">
-        <div class="container d-flex flex-column flex-md-row align-items-center justify-content-center gap-5">
+    <section class="how-it-works">
+        <section class="store-section py-5">
+            <div class="container d-flex flex-column flex-md-row align-items-center justify-content-center gap-5">
 
-            <!-- IMAGEN DEL PRODUCTO -->
-            <div class="product-image text-center">
-                <img id="productImage" src="{{ url_for('static', filename='images/ziloy_negro.jpg') }}" 
-                     alt="Bolsa Térmica Ziloy" class="img-fluid rounded shadow" style="max-width: 350px;">
-                <div class="color-buttons d-flex justify-content-center gap-3 mt-3">
-                    <button class="color-btn" id="blackBtn" style="background-color: black;"></button>
-                    <button class="color-btn" id="pinkBtn" style="background-color: pink;"></button>
-                </div>
-            </div>
-
-            <!-- DETALLES DEL PRODUCTO -->
-            <div class="product-details text-center text-md-start">
-                <h2 class="fw-bold" style="color:#00c9a7;">Bolsa Térmica Ziloy</h2>
-                <p>Mantén tus bebidas a la temperatura perfecta, con estilo y tecnología inteligente.</p>
-
-                <div class="price-box d-flex align-items-center justify-content-center justify-content-md-start gap-3 mt-3">
-                    <span id="price" class="price fw-bold fs-4" style="color:#00c9a7;">$89.900</span>
-
-                    <div class="quantity-box d-flex align-items-center border rounded px-2">
-                        <button class="btn-qty" id="decreaseBtn">-</button>
-                        <input type="text" id="quantity" value="1" class="text-center border-0" style="width: 40px;" readonly>
-                        <button class="btn-qty" id="increaseBtn">+</button>
+                <!-- IMAGEN DEL PRODUCTO -->
+                <div class="product-image text-center">
+                    <img id="productImage" src="{{ url_for('static', filename='images/ziloy_negro.png') }}" 
+                        alt="Bolsa Térmica Ziloy" class="img-fluid rounded shadow" style="max-width: 350px;">
+                    <div class="color-buttons d-flex justify-content-center gap-3 mt-3">
+                        <button class="color-btn" id="blackBtn" style="background-color: black;"></button>
+                        <button class="color-btn" id="pinkBtn" style="background-color: pink;"></button>
                     </div>
                 </div>
 
-                <button class="btn mt-4 px-4 py-2 fw-bold text-light" 
-                        style="background-color:#00c9a7; border-radius:30px;">Comprar
-                </button>
+                <!-- DETALLES DEL PRODUCTO -->
+                <div class="product-details text-center text-md-start">
+                    <h2 class="fw-bold" style="color:#00c9a7;">Bolsa Térmica Ziloy</h2>
+                    <p>Mantén tus bebidas a la temperatura perfecta, con estilo y tecnología inteligente.</p>
+
+                    <div class="price-box d-flex align-items-center justify-content-center justify-content-md-start gap-3 mt-3">
+                        <span id="price" class="price fw-bold fs-4" style="color:#00c9a7;">$89.900</span>
+
+                        <div class="quantity-box d-flex align-items-center border rounded px-2">
+                            <button class="btn-qty" id="decreaseBtn">-</button>
+                            <input type="text" id="quantity" value="1" class="text-center border-0" style="width: 40px;" readonly>
+                            <button class="btn-qty" id="increaseBtn">+</button>
+                        </div>
+                    </div>
+
+                    <button class="btn mt-4 px-4 py-2 fw-bold text-light" 
+                            style="background-color:#00c9a7; border-radius:30px;">Comprar
+                    </button>
+                </div>
             </div>
-        </div>
+        </section>
     </section>
 
     <footer>
@@ -94,11 +102,11 @@
         const pinkBtn = document.getElementById("pinkBtn");
 
         blackBtn.addEventListener("click", () => {
-            productImage.src = "{{ url_for('static', filename='images/ziloy_negro.jpg') }}";
+            productImage.src = "{{ url_for('static', filename='images/ziloy_negro.png') }}";
         });
 
         pinkBtn.addEventListener("click", () => {
-            productImage.src = "{{ url_for('static', filename='images/ziloy_rosado.jpg') }}";
+            productImage.src = "{{ url_for('static', filename='images/ziloy_rosado.png') }}";
         });
 
         // === CONTROL DE CANTIDAD Y PRECIO ===

@@ -20,20 +20,27 @@
                     <li><a href="{{ url_for('conocenos') }}">Sobre Nosotros</a></li>
                 </ul>
             </nav>
-            <a href="/login" class="btn-login">Iniciar Sesión</a>
+            {% if 'user_id' in session %}
+                <a href="{{ url_for('logout') }}" class="btn-login">Cerrar Sesión</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Iniciar Sesión</a>
+            {% endif %}
         </div>
     </header>
 
-    <main class="text-center py-5">
-        <h2 class="mb-4" style="color:#00c9a7;">¿Quiénes somos?</h2>
-        <p class="lead" style="max-width: 800px; margin: auto;">
-            En <strong>Ziloy</strong> creemos en la innovación tecnológica responsable.
-            Nuestra misión es brindar soluciones seguras y sostenibles que ayuden a las empresas a crecer
-            y adaptarse a la era digital sin comprometer la confianza ni la privacidad.
-        </p>
-    </main>
+    <section class="info-section text-white text-center">
+        <main class="text-center">
+            <h2 class="mb-4" style="color:#00c9a7;">¿Quiénes somos?</h2>
+            <p class="lead" style="max-width: 800px; margin: auto;">
+                En <strong>Ziloy</strong> creemos en la innovación tecnológica responsable.
+                Nuestra misión es brindar soluciones seguras y sostenibles que ayuden a las empresas a crecer
+                y adaptarse a la era digital sin comprometer la confianza ni la privacidad.
+            </p>
+        </main>
+    </section>
+
         <!-- SECCIÓN MISIÓN Y VISIÓN -->
-    <section class="info-section text-white text-center py-5">
+    <section class="info-section text-white text-center py-4">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-5 mission-box p-4 mx-2">

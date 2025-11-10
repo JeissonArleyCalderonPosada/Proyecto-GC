@@ -18,7 +18,6 @@ app.secret_key = "clave_super_segura"
 #Configuracion de la base de datos
 load_dotenv()  # carga las variables del archivo .env
 
-app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -84,8 +83,9 @@ def login():
         if usuario and usuario.check_password(password):
             session['user_id'] = usuario.id
             session['user_name'] = usuario.nombre
+            session['is_admin'] = usuario.is_admin
             flash('Inicio de sesión exitoso', 'success')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('index'))
         else:
             flash('Datos incorrectos o usuario no encontrado.', 'error')
             return redirect(url_for('login'))
@@ -98,11 +98,11 @@ def logout():
     flash("Sesión cerrada correctamente", "info")
     return redirect(url_for('login'))
 
-@app.route('/dashboard')
-def dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('dashboard.html', user_name=session.get('user_name'))
+#@app.route('/dashboard')
+#def dashboard():
+#    if 'user_id' not in session:
+#        return redirect(url_for('login'))
+#    return render_template('dashboard.html', user_name=session.get('user_name'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
