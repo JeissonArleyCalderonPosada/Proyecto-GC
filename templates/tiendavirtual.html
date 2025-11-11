@@ -88,7 +88,7 @@
     <div id="purchaseOverlay" class="overlay hidden">
         <div class="purchase-card">
             <h3>¿Deseas confirmar tu compra de la Bolsa Térmica Ziloy?</h3>
-            <p class="text-muted">
+            <p class="text-muted" style="color: #ffffff !important;">
                 El proceso de compra se realizará automáticamente en tu WhatsApp.<br>
                 {% if 'user_id' not in session %}
                 ⚠️ Debes iniciar sesión antes de continuar, necesitamos tu número de teléfono.
@@ -161,13 +161,11 @@
 
     <!-- CAMBIO DE COLOR DEL PRODUCTO -->
     <script>
-        // 1. Elementos para el CAMBIO DE COLOR (IMAGEN y DESCRIPCIÓN)
         const productImage = document.getElementById("productImage");
         const blackBtn = document.getElementById("blackBtn");
         const pinkBtn = document.getElementById("pinkBtn");
-        const descriptionCard = document.getElementById("colorDescriptionCard"); // NUEVO: Elemento de la descripción
+        const descriptionCard = document.getElementById("colorDescriptionCard"); 
 
-        // 2. Contenido de las descripciones (NUEVO)
         const descriptions = {
             'black': {
                 title: 'Edición Elegancia Profesional',
@@ -179,18 +177,14 @@
             }
         };
 
-        // 3. Función de Actualización 
         function updateProductDetails(color) {
-            // Rutas de imágenes 
             const imagePaths = {
                 'black': "{{ url_for('static', filename='images/ziloy_negro.png') }}",
                 'pink': "{{ url_for('static', filename='images/ziloy_rosado.png') }}"
             };
 
-            // A. Actualiza la Imagen
             productImage.src = imagePaths[color];
 
-            // B. Actualiza la Descripción (Solo si el elemento existe)
             if (descriptionCard) {
                 const desc = descriptions[color];
                 descriptionCard.innerHTML = `
@@ -200,16 +194,13 @@
             }
         }
 
-        // 4. Asignar Event Listeners (USANDO LA NUEVA FUNCIÓN)
         blackBtn.addEventListener("click", () => updateProductDetails('black'));
         pinkBtn.addEventListener("click", () => updateProductDetails('pink'));
 
-        // 5. Estado Inicial (Muestra la descripción negra al cargar)
         document.addEventListener('DOMContentLoaded', () => {
             updateProductDetails('black');
         });
 
-        // === CONTROL DE CANTIDAD Y PRECIO ===
         const basePrice = 18;
         const priceEl = document.getElementById("price");
         const quantityInput = document.getElementById("quantity");

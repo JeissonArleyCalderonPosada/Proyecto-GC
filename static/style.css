@@ -944,7 +944,7 @@ body.blurred > *:not(.overlay) {
 }
 
 .purchase-card p {
-    color: #b0b0b0; /* Color gris claro para la descripción (más legible) */
+    color: #ffffff; /* Color gris claro para la descripción (más legible) */
     font-size: 0.95rem;
 }
 
