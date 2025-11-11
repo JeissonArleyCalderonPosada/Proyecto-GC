@@ -21,9 +21,9 @@
                 </ul>
             </nav>
             {% if 'user_id' in session %}
-                <a href="{{ url_for('logout') }}" class="btn-login">Cerrar Sesión</a>
+            <a href="{{ url_for('logout') }}" class="btn-login">Cerrar Sesión</a>
             {% else %}
-                <a href="{{ url_for('login') }}" class="btn-login">Iniciar Sesión</a>
+            <a href="{{ url_for('login') }}" class="btn-login">Iniciar Sesión</a>
             {% endif %}
         </div>
     </header>
@@ -45,7 +45,7 @@
 
                 <!-- IMAGEN DEL PRODUCTO -->
                 <div class="product-image text-center">
-                    <img id="productImage" src="{{ url_for('static', filename='images/ziloy_negro.png') }}" 
+                    <img id="productImage" src="{{ url_for('static', filename='images/ziloy_negro.png') }}"
                         alt="Bolsa Térmica Ziloy" class="img-fluid rounded shadow" style="max-width: 320px;">
                     <div class="color-buttons d-flex justify-content-center gap-3 mt-3">
                         <button class="color-btn" id="blackBtn" style="background-color: black;"></button>
@@ -56,20 +56,23 @@
                 <!-- DETALLES DEL PRODUCTO -->
                 <div class="product-details text-center text-md-start">
                     <h2 class="fw-bold" style="color:#00c9a7;">Bolsa Térmica Ziloy</h2>
-                    <p class="mb-5">Mantén tus bebidas a la temperatura perfecta, con estilo y tecnología inteligente.</p>
+                    <p class="mb-5">Mantén tus bebidas a la temperatura perfecta, con estilo y tecnología inteligente.
+                    </p>
 
-                    <div class="price-box d-flex align-items-center justify-content-center justify-content-md-start gap-3 mt-3">
+                    <div
+                        class="price-box d-flex align-items-center justify-content-center justify-content-md-start gap-3 mt-3">
                         <span id="price" class="price fw-bold fs-4" style="color:#00c9a7;">USD $18</span>
 
                         <div class="quantity-box d-flex align-items-center border rounded px-2">
                             <button class="btn-qty" id="decreaseBtn">-</button>
-                            <input type="text" id="quantity" value="1" class="text-center border-0" style="width: 40px;" readonly>
+                            <input type="text" id="quantity" value="1" class="text-center border-0" style="width: 40px;"
+                                readonly>
                             <button class="btn-qty" id="increaseBtn">+</button>
                         </div>
                     </div>
 
-                    <button class="btn mt-4 px-4 py-2 fw-bold text-light" 
-                            style="background-color:#00c9a7; border-radius:30px;">Comprar
+                    <button class="btn mt-4 px-4 py-2 fw-bold text-light"
+                        style="background-color:#00c9a7; border-radius:30px;">Comprar
                     </button>
 
                     <div id="colorDescriptionCard" class="color-card mt-4 p-3 rounded shadow-sm">
@@ -119,7 +122,7 @@
     </footer>
 
 
-    
+
     <!--CHATBOT FLOTANTE-->
     <div id="chatbotPopup" class="chatbot-popup" style="display:none;">
         <div class="chatbot-header">
@@ -231,6 +234,77 @@
                 chatbotPopup.style.display = 'none';
             });
         }
+    </script>
+
+    <!-- === MODAL DE CONFIRMACIÓN DE COMPRA === -->
+    <div id="purchaseOverlay" class="overlay hidden">
+        <div class="purchase-card">
+            <h3>¿Deseas confirmar tu compra de la Bolsa Térmica Ziloy?</h3>
+            <p class="text-muted">
+                El proceso de compra se realizará automáticamente en tu WhatsApp.<br>
+                {% if 'user_id' not in session %}
+                ⚠️ Debes iniciar sesión antes de continuar, necesitamos tu número de teléfono.
+                {% endif %}
+            </p>
+
+            <div class="purchase-buttons">
+                {% if 'user_id' in session %}
+                <button id="confirmPurchase" class="btn btn-success px-4">Confirmar</button>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-success px-4">Iniciar Sesión</a>
+                {% endif %}
+                <button id="cancelPurchase" class="btn btn-danger px-4">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- === SCRIPT DE CONTROL DEL MODAL === -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnComprar = document.querySelector('.product-details .btn'); 
+            const overlay = document.getElementById('purchaseOverlay');
+            const btnCancelar = document.getElementById('cancelPurchase');
+            const btnConfirmar = document.getElementById('confirmPurchase');
+
+            // Mostrar modal
+            btnComprar.addEventListener('click', (e) => {
+                e.preventDefault();
+                overlay.classList.remove('hidden');
+                document.body.classList.add('blurred');
+            });
+
+            // Ocultar modal
+            btnCancelar.addEventListener('click', () => {
+                overlay.classList.add('hidden');
+                document.body.classList.remove('blurred');
+            });
+
+            // Enviar saludo al bot (modo desarrollo)
+            if (btnConfirmar) {
+                btnConfirmar.addEventListener('click', async () => {
+                    try {
+                        const response = await fetch("/whatsapp", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                            
+                            body: new URLSearchParams({
+                                Body: "hola",
+                                From: "whatsapp:+14155238886"
+                            })
+                        });
+                        if (response.ok) {
+                            alert("Mensaje automático enviado al chatbot de WhatsApp.");
+                        } else {
+                            alert("Error al contactar con el bot");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                    overlay.classList.add('hidden');
+                    document.body.classList.remove('blurred');
+                });
+            }
+        });
     </script>
 
     <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
