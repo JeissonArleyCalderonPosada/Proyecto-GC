@@ -11,6 +11,12 @@ from functools import wraps
 from preguntasFrecuentes import obtener_respuesta
 from dotenv import load_dotenv
 from twilio.twiml.messaging_response import MessagingResponse
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from flask_mail import Message
+from app import app, db, mail
+from models import Pedido
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,6 +32,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Configuración de correo con las variables del entorno
+app.config['MAIL_SERVER'] = os.getenv("SMTP_HOST")
+app.config['MAIL_PORT'] = int(os.getenv("SMTP_PORT", 587))
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv("ADMIN_SMTP_USER")
+app.config['MAIL_PASSWORD'] = os.getenv("ADMIN_SMTP_PASS")
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv("ADMIN_EMAIL")
+
+mail = Mail(app)
+
 # Configuración de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 if not openai.api_key:
@@ -39,6 +55,8 @@ class Usuario(db.Model):
     correo = db.Column(db.String(120), unique=True, nullable=False)
     telefono = db.Column(db.String(20))  # pedidos vía WhatsApp
     password_hash = db.Column(db.String(512), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
     pedidos = db.relationship('Pedido', backref='cliente', lazy=True)
 
     def __repr__(self):
@@ -51,6 +69,8 @@ class Usuario(db.Model):
 class Pedido(db.Model):
     __tablename__ = 'pedidos'
     id = db.Column(db.Integer, primary_key=True)
+    nombre_cliente = db.Column(db.String(100))
+    telefono = db.Column(db.String(20))
     color = db.Column(db.String(50), nullable=False)
     cantidad = db.Column(db.Integer, nullable=False)
     precio_total = db.Column(db.Float, nullable=False)
@@ -63,19 +83,6 @@ class Pedido(db.Model):
 
     def __repr__(self):
         return f'<Pedido Usuario:{self.usuario_id} - Estado:{self.estado}>'
-    
-class Admin(db.Model):
-    __tablename__ = 'admins'
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
-    correo = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(512), nullable=False)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def __repr__(self):
-        return f'<Admin {self.correo}>'
 
 # ===== RUTAS DE LA WEB =====
 @app.route('/')
@@ -103,7 +110,12 @@ def login():
             session['user_name'] = usuario.nombre
             session['is_admin'] = usuario.is_admin
             flash('Inicio de sesión exitoso', 'success')
-            return redirect(url_for('index'))
+
+            if usuario.is_admin:
+                return redirect(url_for('ver_pedidos'))  # Panel admin
+            else:
+                return redirect(url_for('index'))        # Usuario normal
+
         else:
             flash('Datos incorrectos o usuario no encontrado.', 'error')
             return redirect(url_for('login'))
@@ -116,11 +128,14 @@ def logout():
     flash("Sesión cerrada correctamente", "info")
     return redirect(url_for('login'))
 
-#@app.route('/dashboard')
-#def dashboard():
-#    if 'user_id' not in session:
-#        return redirect(url_for('login'))
-#    return render_template('dashboard.html', user_name=session.get('user_name'))
+@app.route('/admin')
+def admin_dashboard():
+    if not session.get('is_admin'):
+        flash("Acceso denegado. No tienes permisos de administrador.", "error")
+        return redirect(url_for('dashboard'))
+
+    pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
+    return render_template('admin_dashboard.html', pedidos=pedidos)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -156,8 +171,49 @@ def register():
 
     return render_template('registro.html')
 
+@app.route('/confirmar/<int:pedido_id>')
+def confirmar_pedido(pedido_id):
+    if not session.get('is_admin'):
+        flash("No tienes permisos para confirmar pedidos.", "error")
+        return redirect(url_for('dashboard'))
 
+    pedido = Pedido.query.get(pedido_id)
+    if pedido:
+        pedido.estado = "confirmado"
+        db.session.commit()
+        flash(f"Pedido #{pedido.id} confirmado exitosamente.", "success")
 
+        # Enviar mensaje de WhatsApp
+        enviar_confirmacion_whatsapp(pedido.telefono, pedido.nombre_cliente)
+    else:
+        flash("Pedido no encontrado.", "error")
+
+    return redirect(url_for('admin_dashboard'))
+
+def enviar_correo_admin(asunto, cuerpo):
+    """Envía un correo a la dueña del negocio notificando un nuevo pedido."""
+    remitente = os.getenv("EMAIL_USER")
+    destinatario = os.getenv("EMAIL_ADMIN")  # correo de la dueña
+    password = os.getenv("EMAIL_PASS")
+
+    if not (remitente and destinatario and password):
+        logging.error("Faltan credenciales de correo en el .env")
+        return
+
+    msg = MIMEMultipart()
+    msg["From"] = remitente
+    msg["To"] = destinatario
+    msg["Subject"] = asunto
+    msg.attach(MIMEText(cuerpo, "plain", "utf-8"))
+
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(remitente, password)
+            server.send_message(msg)
+            logging.info("Correo enviado exitosamente a la dueña.")
+    except Exception as e:
+        logging.error(f"Error al enviar correo: {e}")
 
 # ===== RUTA DE CHATBOT =====
 @app.route("/chat", methods=["POST"])
@@ -226,11 +282,64 @@ def whatsapp_bot():
     elif pedido and not pedido.direccion:
         pedido.direccion = mensaje_usuario.title()
         db.session.commit()
-        msg.body("✅ ¡Gracias! Tu pedido ha sido registrado.\nEsperando confirmación de la dueña del negocio.")
+        msg.body("✅ ¡Gracias! Tu pedido ha sido registrado.\nEsperando confirmación.")
+
+        db.session.add(nuevo_pedido)
+        db.session.commit()
+        enviar_correo_nuevo_pedido(nuevo_pedido)
+
+         # Enviar correo a la admin
+        cuerpo = f"""
+        Nuevo pedido recibido:
+        Cliente: {pedido.nombre_cliente}
+        Teléfono: {pedido.telefono}
+        Color: {pedido.color}
+        Cantidad: {pedido.cantidad}
+        Precio total: {pedido.precio_total}
+        Método de pago: {pedido.metodo_pago}
+        Dirección: {pedido.direccion}
+        """
+        enviar_correo_admin("Nuevo pedido recibido en Ziloy", cuerpo)
     else:
         msg.body("No entendí 😅. Por favor, empieza diciendo *Hola*.")
 
     return str(resp)
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if not session.get('is_admin'):
+        flash("Acceso restringido. Solo la administradora puede ver esto.", "danger")
+        return redirect(url_for('index'))
+
+    pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
+    return render_template('admin_dashboard.html', pedidos=pedidos)
+
+def enviar_correo_nuevo_pedido(pedido):
+    try:
+        msg = Message(
+            subject="📦 Nuevo pedido recibido - Ziloy",
+            recipients=[os.getenv("ADMIN_EMAIL")],
+            body=f"""
+¡Hola!
+
+Se ha recibido un nuevo pedido en Ziloy.
+
+🧾 Detalles del pedido:
+- Cliente: {pedido.cliente.nombre}
+- Teléfono: {pedido.cliente.telefono}
+- Color: {pedido.color}
+- Cantidad: {pedido.cantidad}
+- Método de pago: {pedido.metodo_pago}
+- Dirección: {pedido.direccion}
+- Estado: {pedido.estado}
+
+📍 Ingresa al panel de administración para revisarlo.
+"""
+        )
+        mail.send(msg)
+        print("✅ Correo enviado al admin correctamente.")
+    except Exception as e:
+        print("❌ Error al enviar el correo:", e)
 
 # ===== INICIAR SERVIDOR =====
 if __name__ == '__main__':
