@@ -452,7 +452,7 @@ footer {
 
 /* === SECCIÓN CÓMO FUNCIONA === */
 .how-it-works {
-  background: linear-gradient(135deg, #2b2b2b, #1e1e1e);
+  background: linear-gradient(135deg, #1e1e1e, #1e1e1e);
   color: #f1f1f1;
 }
 .step-box {
@@ -479,29 +479,6 @@ footer {
   margin: 0 auto 1rem auto;
 }
 
-/* === TESTIMONIOS === */
-.testimonials {
-  background-color: #1f1f1f;
-}
-.testimonial-box {
-  background-color: #2b2b2b;
-  border-left: 4px solid #00c9a7;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  transition: 0.3s;
-}
-.testimonial-box:hover {
-  transform: scale(1.03);
-}
-.testimonial-box p {
-  font-style: italic;
-  color: #e6e6e6;
-}
-.testimonial-box h6 {
-  color: #00c9a7;
-  margin-top: 1rem;
-}
-
 /* === LLAMADA A LA ACCIÓN === */
 .cta-section {
   background: #00c9a7;
@@ -524,7 +501,7 @@ footer {
   justify-content: center;
   align-items: center;
   flex-direction: row;
-  gap: 20px;
+  gap: 10px;
   margin-top: 50px;
 }
 
@@ -539,8 +516,8 @@ footer {
   flex-direction: column;
   text-align: center;
   height: 400px;
-  width: 335px;
-  border-radius: 10px;
+  width: 800px;
+  border-radius: 5px;
   color: white;
   cursor: pointer;
   transition: 200ms;
@@ -723,4 +700,102 @@ footer {
 
 .login-link a:hover {
   text-decoration: underline;
+}
+
+/* --- Cards laterales --- */
+
+/* Imagen (izquierda o derecha) */
+.card-img-side,
+.card-img-side-right {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-img-side img,
+.card-img-side-right img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Texto (ambos lados) */
+.card-text-side,
+.card-text-side-right {
+  position: relative;
+  background: #00c9a7;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ajuste para el contenido sobre el pseudo-elemento */
+.card-text-side > *,
+.card-text-side-right > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Efecto diagonal (lado derecho) */
+.card-text-side::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40px;
+  width: 80px;
+  height: 100%;
+  background: #00c9a7;
+  transform: skewX(-10deg);
+  z-index: 1;
+}
+
+/* Efecto diagonal (lado izquierdo) */
+.card-text-side-right::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -40px;
+  width: 80px;
+  height: 100%;
+  background: #00c9a7;
+  transform: skewX(10deg);
+  z-index: 1;
+}
+
+/* Bordes redondeados específicos */
+.card-img-side {
+  border-radius: 1rem 0 0 1rem;
+}
+
+.card-img-side-right {
+  border-radius: 0 1rem 1rem 0;
+}
+
+.card-text-side {
+  border-radius: 0 1rem 1rem 0;
+}
+
+.card-text-side-right {
+  position: relative;
+  background: #00c9a7;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card general */
+.custom-card {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.card-img-side video,
+.card-img-side-right video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
