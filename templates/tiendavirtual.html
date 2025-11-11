@@ -28,14 +28,14 @@
         </div>
     </header>
 
-    <section class="how-it-works py-5">
-        <main class="text-center py-1">
-            <h2 class="mb-4" style="color:#ffffff;">Bienvenido a tu Tienda Virtual</h2>
-            <p class="lead" style="max-width: 800px; margin: auto;">
-                Explora nuestra tienda virtual y descubre productos innovadores diseñados para
-                mejorar tu día a día. Calidad, sostenibilidad y tecnología al alcance de tu mano.
-            </p>
-        </main>
+    <section class="cta-section text-center py-5">
+            <main class="text-center py-1">
+                <h2 class="mb-4" style="color:#ffffff;">Bienvenido a tu Tienda Virtual</h2>
+                <p class="lead" style="max-width: 800px; margin: auto;">
+                    Explora nuestra tienda virtual y descubre productos innovadores diseñados para
+                    mejorar tu día a día. Calidad, sostenibilidad y tecnología al alcance de tu mano.
+                </p>
+            </main>
     </section>
 
     <!-- === SECCIÓN TIENDA VIRTUAL === -->
@@ -82,6 +82,60 @@
             </div>
         </section>
     </section>
+
+    <!-- === MODAL DE CONFIRMACIÓN DE COMPRA === -->
+    <div id="purchaseOverlay" class="overlay hidden">
+        <div class="purchase-card">
+            <h3>¿Deseas confirmar tu compra de la Bolsa Térmica Ziloy?</h3>
+            <p class="text-muted">
+                El proceso de compra se realizará automáticamente en tu WhatsApp.<br>
+                {% if 'user_id' not in session %}
+                ⚠️ Debes iniciar sesión antes de continuar, necesitamos tu número de teléfono.
+                {% endif %}
+            </p>
+
+            <div class="purchase-buttons">
+                {% if 'user_id' in session %}
+                <button id="confirmPurchase" class="btn btn-success px-4">Confirmar</button>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-success px-4">Iniciar Sesión</a>
+                {% endif %}
+                <button id="cancelPurchase" class="btn btn-danger px-4">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-5 text-white" style="background-color: #00c9a7;">
+        <div class="container">
+            <div class="row text-center">
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <i class="fas fa-truck fa-3x mb-3" style="color: #000;"></i> <h5 class="fw-bold mb-3" style="color: #ffffff;">Opciones de Envío en Ecuador</h5>
+                    <ul class="list-unstyled small text-dark mx-auto" style="max-width: 500px; text-align: center;">
+                        <li>Servientrega: Cobertura Nacional</li>
+                        <li>Correos del Ecuador: Económico</li>
+                        <li>Urbano: Entrega Rápida en Ciudades</li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <i class="fas fa-microchip fa-3x mb-3" style="color: #000;"></i> <h5 class="fw-bold mb-3" style="color: #ffffff;">Tecnología Digital Integrada</h5>
+                    <p class="small text-dark">
+                        Nuestra bolsa incorpora sensores digitales y sistemas inteligentes para asegurar que 
+                        tus bebidas mantengan la temperatura exacta por más tiempo, según lo documentado en nuestro proyecto de desarrollo.
+                    </p>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <i class="fas fa-leaf fa-3x mb-3" style="color: #000;"></i> <h5 class="fw-bold mb-3" style="color: #ffffff;">Compromiso Sostenible</h5>
+                    <p class="small text-dark">
+                        Ziloy promueve la Eco-Innovación y el uso de materiales duraderos, alineándose 
+                        con prácticas responsables que minimizan el impacto ambiental y fomentan un consumo consciente.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <p>&copy; 2025 - Ziloy | UCundinamarca y UNL</p>
@@ -201,28 +255,6 @@
             });
         }
     </script>
-
-    <!-- === MODAL DE CONFIRMACIÓN DE COMPRA === -->
-    <div id="purchaseOverlay" class="overlay hidden">
-        <div class="purchase-card">
-            <h3>¿Deseas confirmar tu compra de la Bolsa Térmica Ziloy?</h3>
-            <p class="text-muted">
-                El proceso de compra se realizará automáticamente en tu WhatsApp.<br>
-                {% if 'user_id' not in session %}
-                ⚠️ Debes iniciar sesión antes de continuar, necesitamos tu número de teléfono.
-                {% endif %}
-            </p>
-
-            <div class="purchase-buttons">
-                {% if 'user_id' in session %}
-                <button id="confirmPurchase" class="btn btn-success px-4">Confirmar</button>
-                {% else %}
-                <a href="{{ url_for('login') }}" class="btn btn-success px-4">Iniciar Sesión</a>
-                {% endif %}
-                <button id="cancelPurchase" class="btn btn-danger px-4">Cancelar</button>
-            </div>
-        </div>
-    </div>
 
     <!-- === SCRIPT DE CONTROL DEL MODAL === -->
     <script>

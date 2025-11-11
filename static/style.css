@@ -187,7 +187,7 @@ footer {
 
 /* Bloques de misión y visión */
 .mission-box, .vision-box {
-  background-color: #343434;
+  background-color: #1a1a1a;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.4);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -853,73 +853,116 @@ footer {
     margin-bottom: 0.5rem;
 }
 
+/*estilos Conocenos*/
+
+.founder-box {
+    background-color: #1a1a1a;
+    border: 1px solid #00c9a7;
+    transition: transform 0.3s ease;
+}
+
+.founder-box:hover {
+    transform: translateY(-5px);
+}
+
+.pilar-card {
+    border: none;
+    transition: box-shadow 0.3s ease;
+}
+
+.pilar-card:hover {
+    box-shadow: 0 8px 15px rgb(67, 164, 148) !important;
+}
+
+.pilar-card h3 {
+    font-size: 1.5rem;
+}
+
+.pilar-card p {
+    font-size: 1rem;
+}
+
+/* Asegura que el fondo de la sección principal de información sea oscuro */
+.info-section {
+    background-color: #2b2b2b; 
+    color: #fdfdfd;
+}
+
+.text-ziloy { 
+  color: #00c9a7 !important; 
+}
+
 /* === Estado oculto: no visible, sin clics posibles === */
 .hidden {
-  display: none !important;
-  opacity: 0;
-  pointer-events: none;
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* === Capa del modal (overlay de la confirmación) === */
 .overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(6px);
-  z-index: 9999;
-  opacity: 1;
-  transition: opacity 0.25s ease-in-out;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85); /* Oscurece un poco más el fondo para que el modal resalte */
+    display: flex;
+    align-items: center; /* Centrado vertical */
+    justify-content: center; /* Centrado horizontal */
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.25s ease-in-out;
 }
 
 /* === Difuminado del contenido detrás === */
 body.blurred > *:not(.overlay) {
-  filter: blur(4px);
-  transition: filter 0.25s ease-in-out;
+    filter: blur(4px);
+    transition: filter 0.25s ease-in-out;
 }
 
-/* === Tarjeta modal centrada === */
+/* === Tarjeta modal centrada (MODIFICADA) === */
 .purchase-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 2rem;
-  max-width: 420px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
-  animation: fadeIn 0.3s ease-in-out;
-  position: relative;
-  z-index: 10000;
+    /* CAMBIOS DE FONDO Y COLOR DE TEXTO */
+    background: #2b2b2b; /* APLICA EL GRIS ELEGANTE SOLICITADO */
+    color: #f1f1f1; /* Asegura que el texto general sea blanco */
+    
+    /* Propiedades de diseño existentes */
+    border-radius: 14px;
+    padding: 2rem;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.7); /* Sombra más fuerte para resaltar */
+    animation: fadeIn 0.3s ease-in-out;
+    position: relative;
+    z-index: 10000;
 }
 
 .purchase-card h3 {
-  color: #00a58d;
-  font-weight: 600;
-  margin-bottom: 1rem;
+    color: #00c9a7; /* Color de marca para el título */
+    font-weight: 600;
+    margin-bottom: 1rem;
 }
 
 .purchase-card p {
-  color: #555;
-  font-size: 0.95rem;
+    color: #b0b0b0; /* Color gris claro para la descripción (más legible) */
+    font-size: 0.95rem;
 }
 
 .purchase-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
 }
 
 /* === Animación de aparición del modal === */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
