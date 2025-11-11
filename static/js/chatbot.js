@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("prediccionBtn").addEventListener("click", () => {
       chatMode = "predictivo";
-      appendMessage("bot", "Excelente! Envíame los datos de tu bebida para predecir cuánto tardará en enfriarse.");
+      appendMessage("bot", "Excelente! Envíame los datos de tu bebida para predecir cuánto tardará en enfriarse. Para comenzar escribe OK");
       optionsDiv.remove();
     });
   }
