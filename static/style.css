@@ -852,3 +852,74 @@ footer {
     font-size: 1.4rem; 
     margin-bottom: 0.5rem;
 }
+
+/* === Estado oculto: no visible, sin clics posibles === */
+.hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* === Capa del modal (overlay de la confirmación) === */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+}
+
+/* === Difuminado del contenido detrás === */
+body.blurred > *:not(.overlay) {
+  filter: blur(4px);
+  transition: filter 0.25s ease-in-out;
+}
+
+/* === Tarjeta modal centrada === */
+.purchase-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 2rem;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+  z-index: 10000;
+}
+
+.purchase-card h3 {
+  color: #00a58d;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.purchase-card p {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.purchase-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* === Animación de aparición del modal === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
