@@ -41,6 +41,21 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv("ADMIN_EMAIL")
 
 mail = Mail(app)
 
+
+def format_whatsapp_number(num):
+
+    if not num:
+        return None
+    n = str(num).strip()
+    if n.lower().startswith('whatsapp:'):
+        n = n.split(':', 1)[1]
+    n = n.replace(' ', '').replace('-', '')
+    if n.startswith('00'):
+        n = '+' + n[2:]
+    if not n.startswith('+') and n.isdigit():
+        n = '+' + n
+    return f'whatsapp:{n}'
+
 # Configuración de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 if not openai.api_key:
@@ -180,15 +195,36 @@ def enviar_confirmacion_whatsapp(telefono, nombre_cliente):
         logging.error("Faltan credenciales de Twilio en el .env")
         return
 
+    # Normalizar números para evitar prefijos duplicados (ej: "whatsapp:whatsapp:+123")
+    def _format_whatsapp_number(num):
+        if not num:
+            return None
+        n = str(num).strip()
+        # quitar prefijo si existe
+        if n.lower().startswith('whatsapp:'):
+            n = n.split(':', 1)[1]
+        # limpiar espacios y guiones
+        n = n.replace(' ', '').replace('-', '')
+        # convertir 00-prefijo a +
+        if n.startswith('00'):
+            n = '+' + n[2:]
+        # asegurar + para E.164
+        if not n.startswith('+') and n.isdigit():
+            n = '+' + n
+        return f'whatsapp:{n}'
+
     client = Client(account_sid, auth_token)
     mensaje = f"✅ Hola {nombre_cliente}, tu pedido ha sido confirmado y está en camino."
+    to_number = _format_whatsapp_number(telefono)
+    from_number = _format_whatsapp_number(whatsapp_from)
+    logging.info(f"Enviando WhatsApp confirmación from={from_number} to={to_number}")
     try:
         client.messages.create(
             body=mensaje,
-            from_=whatsapp_from,
-            to=f"whatsapp:{telefono}"
+            from_=from_number,
+            to=to_number
         )
-        logging.info(f"Mensaje WhatsApp enviado a {telefono}")
+        logging.info(f"Mensaje WhatsApp enviado a {to_number}")
     except Exception as e:
         logging.error(f"Error al enviar mensaje WhatsApp: {e}")
 
@@ -212,13 +248,15 @@ def confirmar_pedido(pedido_id):
     return redirect(url_for('admin_dashboard'))#
 
 def enviar_correo_admin(asunto, cuerpo):
-    """Envía un correo a la dueña del negocio notificando un nuevo pedido."""
-    remitente = os.getenv("EMAIL_USER")
-    destinatario = os.getenv("EMAIL_ADMIN")  # correo de la administradora
-    password = os.getenv("EMAIL_PASS")
+    """Envía un correo al administrador notificando un nuevo pedido."""
+    remitente = os.getenv("ADMIN_SMTP_USER")
+    destinatario = os.getenv("ADMIN_EMAIL")
+    password = os.getenv("ADMIN_SMTP_PASS")
+    servidor = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    puerto = int(os.getenv("SMTP_PORT", 587))
 
-    if not (remitente and destinatario and password):
-        logging.error("Faltan credenciales de correo en el .env")
+    if not all([remitente, destinatario, password]):
+        logging.error(f"Faltan credenciales de correo en el .env | remitente={remitente}, pass={'OK' if password else None}, dest={destinatario}")
         return
 
     msg = MIMEMultipart()
@@ -228,13 +266,16 @@ def enviar_correo_admin(asunto, cuerpo):
     msg.attach(MIMEText(cuerpo, "plain", "utf-8"))
 
     try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        logging.info(f"Conectando al servidor SMTP como {remitente} ...")
+        with smtplib.SMTP(servidor, puerto) as server:
             server.starttls()
             server.login(remitente, password)
             server.send_message(msg)
-            logging.info("Correo enviado exitosamente a la dueña.")
+            logging.info(f"✅ Correo enviado exitosamente a {destinatario}.")
+    except smtplib.SMTPAuthenticationError as e:
+        logging.error(f"🚫 Error de autenticación SMTP: {e}")
     except Exception as e:
-        logging.error(f"Error al enviar correo: {e}")
+        logging.error(f"⚠️ Error general al enviar correo: {e}")
 
 # ===== RUTA DE CHATBOT =====
 @app.route("/chat", methods=["POST"])
@@ -262,8 +303,10 @@ def prediccion():
 # ===== RUTA PARA ENVIAR MENSAJE DE PRUEBA AL PROPIO WHATSAPP DEL DESARROLLADOR =====
 @app.route("/enviar_mensaje_whatsapp", methods=["POST"])
 def enviar_mensaje_whatsapp():
-    """Envía un mensaje 'hola' al número del desarrollador definido en TWILIO_WHATSAPP_TO,
-    ignorando temporalmente el teléfono del usuario en sesión."""
+    """
+    Envía al sandbox de Twilio un mensaje de bienvenida + 
+    'escribe OK' para que el usuario inicie el chatbot manualmente.
+    """
     if not session.get('user_id'):
         return jsonify({"status": "error", "message": "Usuario no autenticado"}), 401
 
@@ -273,81 +316,91 @@ def enviar_mensaje_whatsapp():
     try:
         account_sid = os.getenv("TWILIO_ACCOUNT_SID")
         auth_token = os.getenv("TWILIO_AUTH_TOKEN")
-        whatsapp_from = os.getenv("TWILIO_WHATSAPP_FROM")
-        whatsapp_to = os.getenv("TWILIO_WHATSAPP_TO")  #número personal de prueba
+        whatsapp_from = os.getenv("TWILIO_WHATSAPP_FROM")  # sandbox Twilio
+        whatsapp_to = os.getenv("TWILIO_WHATSAPP_TO")      # número verificado 
 
         if not all([account_sid, auth_token, whatsapp_from, whatsapp_to]):
             logging.error("Faltan credenciales Twilio en .env")
             return jsonify({"status": "error", "message": "Configuración Twilio incompleta"}), 500
 
-        sid_raw = os.getenv("TWILIO_ACCOUNT_SID")
-        token_raw = os.getenv("TWILIO_AUTH_TOKEN")
-        from_num_raw = os.getenv("TWILIO_WHATSAPP_FROM")
-        
-        account_sid = sid_raw.strip() if sid_raw else None
-        auth_token = token_raw.strip() if token_raw else None
-        twilio_whatsapp_number = from_num_raw.strip() if from_num_raw else None
+        # Helper para limpiar formato
+        def _format_whatsapp_number(num):
+            n = str(num or "").strip().replace(" ", "").replace("-", "")
+            if n.lower().startswith("whatsapp:"):
+                return n
+            if n.startswith("00"):
+                n = "+" + n[2:]
+            if not n.startswith("+"):
+                n = "+" + n
+            return f"whatsapp:{n}"
+
+        from_number = _format_whatsapp_number(whatsapp_from)
+        to_number = _format_whatsapp_number(whatsapp_to)
 
         client = Client(account_sid, auth_token)
-        body_text = f"hola - mensaje automático desde Ziloy | Usuario en sesión: {nombre}"
 
-        message = client.messages.create(
-            body=body_text,
-            from_=whatsapp_from,
-            to=f"whatsapp:{whatsapp_to}"
-        )
+        # Mensaje de presentación
+        body_intro = f"👋 Hola {nombre}, mensaje automático desde *Ziloy*. 👜"
+        msg_intro = client.messages.create(body=body_intro, from_=from_number, to=to_number)
+        logging.info(f"Intro enviado. SID: {msg_intro.sid}")
 
-        logging.info(f"📨 Mensaje enviado a {whatsapp_to}. SID: {message.sid}")
-        return jsonify({"status": "success", "message": f"Mensaje enviado al número de prueba: {whatsapp_to}"})
+        # Invitación para que el usuario escriba OK
+        body_ok = "✉️  Escribe *OK* para avanzar con tu compra."
+        msg_ok = client.messages.create(body=body_ok, from_=from_number, to=to_number)
+        logging.info(f"Mensaje 'escribe OK' enviado. SID: {msg_ok.sid}")
+
+        return jsonify({
+            "status": "success",
+            "message": f"Mensajes enviados a {to_number}. "
+                       f"SIDs: {[msg_intro.sid, msg_ok.sid]}"
+        })
 
     except Exception as e:
         logging.error(f"Error enviando mensaje WhatsApp: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
     
-# ===== RUTA CHATBOT WHATSAPP =====
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_bot():
-    from flask import request
     mensaje_usuario = request.form.get('Body', '').strip().lower()
     numero_usuario = request.form.get('From', '').replace('whatsapp:', '')
 
     resp = MessagingResponse()
     msg = resp.message()
 
-    # Buscar usuario en base de datos (aquí puedes asociarlo luego por número)
-    usuario = Usuario.query.filter_by(correo='cliente@ejemplo.com').first()
+    # Buscar usuario
+    usuario = Usuario.query.filter_by(telefono=numero_usuario).first()
     if not usuario:
-        msg.body("⚠️ No estás registrado en Ziloy. Por favor regístrate primero en la web para poder hacer pedidos.")
+        msg.body("⚠️ No estás registrado en Ziloy. Por favor regístrate primero en la web.")
         return str(resp)
 
+    # Buscar un pedido pendiente o crear solo cuando tengamos todos los datos
     pedido = Pedido.query.filter_by(telefono=numero_usuario, estado="pendiente").first()
 
-    # Mensaje inicial
-    if "hola" in mensaje_usuario:
-        msg.body(f"👋 ¡Hola {usuario.nombre}! Soy el asistente virtual de *Ziloy* 👜.\n\nCada bolsa tiene un valor de *18 dólares*.\n\n¿Deseas el color *negro* o *rosado*?")
-    
-    # Nuevo pedido si no existe
-    elif not pedido:
-        nuevo_pedido = Pedido(
+    # 1️⃣ Inicio (OK o hola)
+    if "ok" in mensaje_usuario or "hola" in mensaje_usuario:
+        msg.body(
+            f"👋 ¡Hola {usuario.nombre}! Soy el asistente virtual de *Ziloy* 👜.\n\n"
+            "Cada bolsa tiene un valor de *18 dólares*.\n\n"
+            "¿Deseas el color *negro* o *rosado*?"
+        )
+
+    # 2️⃣ Elegir color (crear estructura temporal en sesión)
+    elif not pedido and mensaje_usuario in ["negro", "rosado"]:
+        pedido = Pedido(
             nombre_cliente=usuario.nombre,
             telefono=numero_usuario,
-            usuario_id=usuario.id
+            color=mensaje_usuario.title(),
+            cantidad=0,          # se actualiza más adelante
+            precio_total=0.0,    # se actualizará
+            usuario_id=usuario.id,
+            estado="pendiente"
         )
-        db.session.add(nuevo_pedido)
+        db.session.add(pedido)
         db.session.commit()
-        msg.body("Empecemos 🛍️ ¿Qué color prefieres para tu bolsa térmica? (Negro o Rosado)")
+        msg.body("Perfecto 🎨 ¿Cuántas unidades deseas?")
 
-    # Escoger color
-    elif pedido and not pedido.color:
-        if mensaje_usuario in ["negro", "rosado"]:
-            pedido.color = mensaje_usuario.title()
-            db.session.commit()
-            msg.body("Perfecto 🎨 ¿Cuántas unidades deseas?")
-        else:
-            msg.body("Solo tenemos disponibles en *Negro* o *Rosado*. Por favor elige uno de esos colores.")
-
-    # Escoger cantidad
-    elif pedido and pedido.color and not pedido.cantidad:
+    # 3️⃣ Cantidad
+    elif pedido and pedido.cantidad == 0:
         try:
             cantidad = int(mensaje_usuario)
             pedido.cantidad = cantidad
@@ -355,9 +408,9 @@ def whatsapp_bot():
             db.session.commit()
             msg.body("¿Cuál será tu método de pago? (Transferencia o Efectivo)")
         except ValueError:
-            msg.body("Por favor ingresa un número válido para la cantidad.")
+            msg.body("Por favor ingresa un número válido para la cantidad (ej. 1, 2, 3).")
 
-    # Escoger método de pago
+    # 4️⃣ Método de pago
     elif pedido and not pedido.metodo_pago:
         if "transferencia" in mensaje_usuario:
             pedido.metodo_pago = "Transferencia"
@@ -368,63 +421,67 @@ def whatsapp_bot():
                 "Cuenta de ahorro transaccional\n"
                 "Número: *2204633778*\n"
                 "A nombre de: *Ángela Magali Camacho Yaguana*\n\n"
-                "Cuando completes el pago, envíame tu *dirección de entrega*. 🚚"
+                "Ahora envíame tu *dirección de entrega* 🏠 o indica si será *presencial*."
             )
         elif "efectivo" in mensaje_usuario:
             pedido.metodo_pago = "Efectivo"
             db.session.commit()
-            msg.body(
-                "Perfecto. Puedes pagar el total en efectivo.\n\n"
-                "Por favor, envíame tu *dirección de entrega* o especifica si deseas recoger de forma *presencial*."
-            )
+            msg.body("Perfecto 💵. Envíame tu *dirección de entrega* o dime si prefieres recoger de forma *presencial*.")
         else:
-            msg.body("Métodos aceptados: *Transferencia* o *Efectivo*. Por favor selecciona uno de ellos.")
+            msg.body("Por favor elige entre *Transferencia* o *Efectivo*.")
 
-    # Dirección (domicilio o presencial)
+    # 5️⃣ Dirección (domicilio/presencial) → ya finalizamos
     elif pedido and not pedido.direccion:
         if "presencial" in mensaje_usuario:
-            pedido.direccion = "Presencial - Afuera de la Universidad Nacional de Loja, Av. Pío Jaramillo Alvarado y Reinaldo Espinosa​ Loja, Ecuador"
-            pedido.precio_total += 0  # Sin envío
+            pedido.direccion = (
+                "Presencial - Afuera de la Universidad Nacional de Loja, "
+                "Av. Pío Jaramillo Alvarado y Reinaldo Espinosa, Loja, Ecuador"
+            )
             db.session.commit()
             msg.body(
-                "Perfecto, puedes recoger tu pedido en:\n"
-                "*Afuera de la Universidad Nacional de Loja*\n"
+                "📍 Perfecto. Puedes recoger tu pedido:\n"
+                "Afuera de la Universidad Nacional de Loja, "
                 "Av. Pío Jaramillo Alvarado y Reinaldo Espinosa, Loja, Ecuador.\n\n"
-                "¡Gracias! Tu pedido ha sido registrado y está pendiente de confirmación."
+                "✅ ¡Gracias! Tu pedido ha sido registrado correctamente y está pendiente de confirmación. 🧾"
             )
 
         elif "ecuador" in mensaje_usuario or "domicilio" in mensaje_usuario:
-            pedido.direccion = "Domicilio en Ecuador (pendiente de confirmar ubicación exacta)"
-            pedido.precio_total += 6  # envío adicional por Servientrega
+            pedido.direccion = "Domicilio en Ecuador (pendiente confirmar detalles exactos)"
+            pedido.precio_total += 6  # Envío adicional
             db.session.commit()
             msg.body(
-                "🚚 Perfecto, realizaremos el envío por *Servientrega* (+6 USD de envío).\n"
+                "🚚 Envío agregado por *Servientrega* (+6 USD).\n"
                 "Por favor confirma la provincia y dirección exacta dentro de Ecuador."
             )
 
         else:
-            msg.body("❌ Por ahora solo realizamos envíos dentro del *territorio nacional de Ecuador*. Si estás en otro país, aún no contamos con cobertura internacional.")
+            msg.body(
+                "❌ Por ahora solo realizamos envíos dentro del territorio nacional de Ecuador.\n"
+                "Indica si es *presencial* o dirección dentro de *Ecuador*."
+            )
 
-    # Cierre del pedido
+    # 6️⃣ Confirmación final
     elif pedido and pedido.direccion:
-        msg.body("✅ Gracias, tu pedido ya fue registrado completamente. En breve recibirás confirmación por WhatsApp y correo electrónico.")
+        msg.body(
+            "✅ Gracias, tu pedido ya fue registrado completamente. "
+            "En breve recibirás confirmación por WhatsApp y correo electrónico."
+        )
 
-        # Enviar correo a admin con el pedido
         cuerpo = f"""
-        Nuevo pedido recibido:
+Nuevo pedido recibido:
 
-        Cliente: {pedido.nombre_cliente}
-        Teléfono: {pedido.telefono}
-        Color: {pedido.color}
-        Cantidad: {pedido.cantidad}
-        Precio total (USD): {pedido.precio_total}
-        Método de pago: {pedido.metodo_pago}
-        Dirección: {pedido.direccion}
-        """
+Cliente: {pedido.nombre_cliente}
+Teléfono: {pedido.telefono}
+Color: {pedido.color}
+Cantidad: {pedido.cantidad}
+Precio total (USD): {pedido.precio_total}
+Método de pago: {pedido.metodo_pago}
+Dirección: {pedido.direccion}
+"""
         enviar_correo_admin("Nuevo pedido recibido en Ziloy", cuerpo)
 
     else:
-        msg.body("No logré entenderte 😅. Por favor empieza diciendo *Hola* para hacer un nuevo pedido.")
+        msg.body("No logré entenderte 😅. Por favor ingresa un valor válido según el paso actual del pedido.")
 
     return str(resp)
 
@@ -456,7 +513,7 @@ Detalles del pedido:
 - Dirección: {pedido.direccion}
 - Estado: {pedido.estado}
 
-📍 Ingresa al panel de administración para revisarlo.
+Ingresa al panel de administración para revisarlo.
 """
         )
         mail.send(msg)
@@ -480,10 +537,13 @@ def rechazar_pedido(pedido_id):
         # Avisar por WhatsApp al cliente
         try:
             client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
+            from_number = format_whatsapp_number(os.getenv("TWILIO_WHATSAPP_FROM"))
+            to_number = format_whatsapp_number(pedido.telefono)
+            logging.info(f"Enviando aviso rechazo from={from_number} to={to_number}")
             client.messages.create(
                 body=f"Hola {pedido.nombre_cliente}, tu pedido ha sido rechazado. Revisa los datos de la transferencia e inténtalo nuevamente.",
-                from_=os.getenv("TWILIO_WHATSAPP_FROM"),
-                to=f"whatsapp:{pedido.telefono}"
+                from_=from_number,
+                to=to_number
             )
         except Exception as e:
             logging.error(f"Error al avisar rechazo vía WhatsApp: {e}")
@@ -508,10 +568,13 @@ def entregar_pedido(pedido_id):
         # Notificar al cliente por WhatsApp
         try:
             client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
+            from_number = format_whatsapp_number(os.getenv("TWILIO_WHATSAPP_FROM"))
+            to_number = format_whatsapp_number(pedido.telefono)
+            logging.info(f"Enviando aviso entrega from={from_number} to={to_number}")
             client.messages.create(
                 body=f"¡Hola {pedido.nombre_cliente}! Tu pedido ha sido *entregado exitosamente*. 🎉 Gracias por confiar en Ziloy 👜",
-                from_=os.getenv("TWILIO_WHATSAPP_FROM"),
-                to=f"whatsapp:{pedido.telefono}"
+                from_=from_number,
+                to=to_number
             )
         except Exception as e:
             logging.error(f"Error al avisar entrega vía WhatsApp: {e}")
