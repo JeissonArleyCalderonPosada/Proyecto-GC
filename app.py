@@ -11,12 +11,11 @@ from functools import wraps
 from preguntasFrecuentes import obtener_respuesta
 from dotenv import load_dotenv
 from twilio.twiml.messaging_response import MessagingResponse
+from twilio.rest import Client
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask_mail import Message
-from app import app, db, mail
-from models import Pedido
+from flask_mail import Message, Mail
 
 logging.basicConfig(level=logging.INFO)
 
@@ -129,10 +128,10 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/admin')
-def admin_dashboard():
+def admin_home():
     if not session.get('is_admin'):
         flash("Acceso denegado. No tienes permisos de administrador.", "error")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('login'))
 
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template('admin_dashboard.html', pedidos=pedidos)
@@ -170,6 +169,29 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('registro.html')
+
+
+def enviar_confirmacion_whatsapp(telefono, nombre_cliente):
+    """Envía un mensaje de confirmación al cliente vía WhatsApp usando Twilio."""
+    account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+    auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+    whatsapp_from = os.getenv("TWILIO_WHATSAPP_FROM")
+
+    if not (account_sid and auth_token and whatsapp_from):
+        logging.error("Faltan credenciales de Twilio en el .env")
+        return
+
+    client = Client(account_sid, auth_token)
+    mensaje = f"✅ Hola {nombre_cliente}, tu pedido ha sido confirmado y está en camino."
+    try:
+        client.messages.create(
+            body=mensaje,
+            from_=whatsapp_from,
+            to=f"whatsapp:{telefono}"
+        )
+        logging.info(f"Mensaje WhatsApp enviado a {telefono}")
+    except Exception as e:
+        logging.error(f"Error al enviar mensaje WhatsApp: {e}")
 
 @app.route('/confirmar/<int:pedido_id>')
 def confirmar_pedido(pedido_id):
@@ -270,7 +292,7 @@ def whatsapp_bot():
     elif pedido and pedido.color and not pedido.cantidad:
         try:
             pedido.cantidad = int(mensaje_usuario)
-            pedido.precio_total = pedido.cantidad * 25000  # ejemplo: cada producto vale 25,000
+            pedido.precio_total = pedido.cantidad * 18  # ejemplo: cada producto vale 25,000
             db.session.commit()
             msg.body("¿Qué método de pago usarás? (Nequi, tarjeta, efectivo)")
         except ValueError:
@@ -284,9 +306,15 @@ def whatsapp_bot():
         db.session.commit()
         msg.body("✅ ¡Gracias! Tu pedido ha sido registrado.\nEsperando confirmación.")
 
+        nuevo_pedido = Pedido(
+            nombre_cliente=usuario.nombre,
+            telefono=numero_usuario,
+            usuario_id=usuario.id
+        )
         db.session.add(nuevo_pedido)
         db.session.commit()
         enviar_correo_nuevo_pedido(nuevo_pedido)
+
 
          # Enviar correo a la admin
         cuerpo = f"""
@@ -305,7 +333,7 @@ def whatsapp_bot():
 
     return str(resp)
 
-@app.route('/admin/dashboard')
+@app.route('/admin')
 def admin_dashboard():
     if not session.get('is_admin'):
         flash("Acceso restringido. Solo la administradora puede ver esto.", "danger")
