@@ -853,7 +853,6 @@ footer {
     margin-bottom: 0.5rem;
 }
 
-<<<<<<< HEAD
 /*estilos Conocenos*/
 
 .founder-box {
@@ -891,75 +890,79 @@ footer {
 
 .text-ziloy { 
   color: #00c9a7 !important; 
-=======
+}
+
 /* === Estado oculto: no visible, sin clics posibles === */
 .hidden {
-  display: none !important;
-  opacity: 0;
-  pointer-events: none;
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* === Capa del modal (overlay de la confirmación) === */
 .overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(6px);
-  z-index: 9999;
-  opacity: 1;
-  transition: opacity 0.25s ease-in-out;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85); /* Oscurece un poco más el fondo para que el modal resalte */
+    display: flex;
+    align-items: center; /* Centrado vertical */
+    justify-content: center; /* Centrado horizontal */
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.25s ease-in-out;
 }
 
 /* === Difuminado del contenido detrás === */
 body.blurred > *:not(.overlay) {
-  filter: blur(4px);
-  transition: filter 0.25s ease-in-out;
+    filter: blur(4px);
+    transition: filter 0.25s ease-in-out;
 }
 
-/* === Tarjeta modal centrada === */
+/* === Tarjeta modal centrada (MODIFICADA) === */
 .purchase-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 2rem;
-  max-width: 420px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
-  animation: fadeIn 0.3s ease-in-out;
-  position: relative;
-  z-index: 10000;
+    /* CAMBIOS DE FONDO Y COLOR DE TEXTO */
+    background: #2b2b2b; /* APLICA EL GRIS ELEGANTE SOLICITADO */
+    color: #f1f1f1; /* Asegura que el texto general sea blanco */
+    
+    /* Propiedades de diseño existentes */
+    border-radius: 14px;
+    padding: 2rem;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.7); /* Sombra más fuerte para resaltar */
+    animation: fadeIn 0.3s ease-in-out;
+    position: relative;
+    z-index: 10000;
 }
 
 .purchase-card h3 {
-  color: #00a58d;
-  font-weight: 600;
-  margin-bottom: 1rem;
+    color: #00c9a7; /* Color de marca para el título */
+    font-weight: 600;
+    margin-bottom: 1rem;
 }
 
 .purchase-card p {
-  color: #555;
-  font-size: 0.95rem;
+    color: #b0b0b0; /* Color gris claro para la descripción (más legible) */
+    font-size: 0.95rem;
 }
 
 .purchase-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
 }
 
 /* === Animación de aparición del modal === */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
->>>>>>> b8d8f817a7d799fc99da59c61b320ac4fddfd005
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

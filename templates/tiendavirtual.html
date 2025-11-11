@@ -83,6 +83,27 @@
         </section>
     </section>
 
+    <!-- === MODAL DE CONFIRMACIÓN DE COMPRA === -->
+    <div id="purchaseOverlay" class="overlay hidden">
+        <div class="purchase-card">
+            <h3>¿Deseas confirmar tu compra de la Bolsa Térmica Ziloy?</h3>
+            <p class="text-muted">
+                El proceso de compra se realizará automáticamente en tu WhatsApp.<br>
+                {% if 'user_id' not in session %}
+                ⚠️ Debes iniciar sesión antes de continuar, necesitamos tu número de teléfono.
+                {% endif %}
+            </p>
+
+            <div class="purchase-buttons">
+                {% if 'user_id' in session %}
+                <button id="confirmPurchase" class="btn btn-success px-4">Confirmar</button>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-success px-4">Iniciar Sesión</a>
+                {% endif %}
+                <button id="cancelPurchase" class="btn btn-danger px-4">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <div class="container-fluid py-5 text-white" style="background-color: #00c9a7;">
         <div class="container">
@@ -115,7 +136,6 @@
             </div>
         </div>
     </div>
-
 
     <footer>
         <p>&copy; 2025 - Ziloy | UCundinamarca y UNL</p>
@@ -235,28 +255,6 @@
             });
         }
     </script>
-
-    <!-- === MODAL DE CONFIRMACIÓN DE COMPRA === -->
-    <div id="purchaseOverlay" class="overlay hidden">
-        <div class="purchase-card">
-            <h3>¿Deseas confirmar tu compra de la Bolsa Térmica Ziloy?</h3>
-            <p class="text-muted">
-                El proceso de compra se realizará automáticamente en tu WhatsApp.<br>
-                {% if 'user_id' not in session %}
-                ⚠️ Debes iniciar sesión antes de continuar, necesitamos tu número de teléfono.
-                {% endif %}
-            </p>
-
-            <div class="purchase-buttons">
-                {% if 'user_id' in session %}
-                <button id="confirmPurchase" class="btn btn-success px-4">Confirmar</button>
-                {% else %}
-                <a href="{{ url_for('login') }}" class="btn btn-success px-4">Iniciar Sesión</a>
-                {% endif %}
-                <button id="cancelPurchase" class="btn btn-danger px-4">Cancelar</button>
-            </div>
-        </div>
-    </div>
 
     <!-- === SCRIPT DE CONTROL DEL MODAL === -->
     <script>
