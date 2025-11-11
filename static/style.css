@@ -187,7 +187,7 @@ footer {
 
 /* Bloques de misión y visión */
 .mission-box, .vision-box {
-  background-color: #343434;
+  background-color: #1a1a1a;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.4);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -851,4 +851,43 @@ footer {
     font-weight: bold;
     font-size: 1.4rem; 
     margin-bottom: 0.5rem;
+}
+
+/*estilos Conocenos*/
+
+.founder-box {
+    background-color: #1a1a1a;
+    border: 1px solid #00c9a7;
+    transition: transform 0.3s ease;
+}
+
+.founder-box:hover {
+    transform: translateY(-5px);
+}
+
+.pilar-card {
+    border: none;
+    transition: box-shadow 0.3s ease;
+}
+
+.pilar-card:hover {
+    box-shadow: 0 8px 15px rgb(67, 164, 148) !important;
+}
+
+.pilar-card h3 {
+    font-size: 1.5rem;
+}
+
+.pilar-card p {
+    font-size: 1rem;
+}
+
+/* Asegura que el fondo de la sección principal de información sea oscuro */
+.info-section {
+    background-color: #2b2b2b; 
+    color: #fdfdfd;
+}
+
+.text-ziloy { 
+  color: #00c9a7 !important; 
 }
