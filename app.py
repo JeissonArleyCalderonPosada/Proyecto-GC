@@ -111,7 +111,7 @@ def login():
             flash('Inicio de sesión exitoso', 'success')
 
             if usuario.is_admin:
-                return redirect(url_for('ver_pedidos'))  # Panel admin
+                return redirect(url_for('admin_dashboard'))  # Panel admin 
             else:
                 return redirect(url_for('index'))        # Usuario normal
 
@@ -215,7 +215,7 @@ def confirmar_pedido(pedido_id):
 def enviar_correo_admin(asunto, cuerpo):
     """Envía un correo a la dueña del negocio notificando un nuevo pedido."""
     remitente = os.getenv("EMAIL_USER")
-    destinatario = os.getenv("EMAIL_ADMIN")  # correo de la dueña
+    destinatario = os.getenv("EMAIL_ADMIN")  # correo de la administradora
     password = os.getenv("EMAIL_PASS")
 
     if not (remitente and destinatario and password):
@@ -270,42 +270,20 @@ def whatsapp_bot():
     resp = MessagingResponse()
     msg = resp.message()
 
-    # Buscar usuario en base de datos
-    usuario = Usuario.query.filter_by(correo='cliente@ejemplo.com').first()  # puedes cambiar esto si ya se guarda el correo o número
+    # Buscar usuario en base de datos (aquí puedes asociarlo luego por número)
+    usuario = Usuario.query.filter_by(correo='cliente@ejemplo.com').first()
     if not usuario:
-        msg.body("⚠️ No estás registrado en Ziloy. Por favor regístrate primero en la web.")
+        msg.body("⚠️ No estás registrado en Ziloy. Por favor regístrate primero en la web para poder hacer pedidos.")
         return str(resp)
 
     pedido = Pedido.query.filter_by(telefono=numero_usuario, estado="pendiente").first()
 
+    # Mensaje inicial
     if "hola" in mensaje_usuario:
-        msg.body(f"👋 ¡Hola {usuario.nombre}! Soy el asistente de Ziloy.\n\n¿De qué color deseas tu producto?")
+        msg.body(f"👋 ¡Hola {usuario.nombre}! Soy el asistente virtual de *Ziloy* 👜.\n\nCada bolsa tiene un valor de *18 dólares*.\n\n¿Deseas el color *negro* o *rosado*?")
+    
+    # Nuevo pedido si no existe
     elif not pedido:
-        nuevo_pedido = Pedido(nombre_cliente=usuario.nombre, telefono=numero_usuario, usuario_id=usuario.id)
-        db.session.add(nuevo_pedido)
-        db.session.commit()
-        msg.body("¿Qué color prefieres para tu producto?")
-    elif pedido and not pedido.color:
-        pedido.color = mensaje_usuario.title()
-        db.session.commit()
-        msg.body("¿Cuántas unidades deseas?")
-    elif pedido and pedido.color and not pedido.cantidad:
-        try:
-            pedido.cantidad = int(mensaje_usuario)
-            pedido.precio_total = pedido.cantidad * 18  # ejemplo: cada producto vale 25,000
-            db.session.commit()
-            msg.body("¿Qué método de pago usarás? (Nequi, tarjeta, efectivo)")
-        except ValueError:
-            msg.body("Por favor ingresa un número válido para la cantidad.")
-    elif pedido and not pedido.metodo_pago:
-        pedido.metodo_pago = mensaje_usuario.title()
-        db.session.commit()
-        msg.body("Perfecto 🧾 Envíame tu dirección de entrega 🏠")
-    elif pedido and not pedido.direccion:
-        pedido.direccion = mensaje_usuario.title()
-        db.session.commit()
-        msg.body("✅ ¡Gracias! Tu pedido ha sido registrado.\nEsperando confirmación.")
-
         nuevo_pedido = Pedido(
             nombre_cliente=usuario.nombre,
             telefono=numero_usuario,
@@ -313,23 +291,96 @@ def whatsapp_bot():
         )
         db.session.add(nuevo_pedido)
         db.session.commit()
-        enviar_correo_nuevo_pedido(nuevo_pedido)
+        msg.body("Empecemos 🛍️ ¿Qué color prefieres para tu bolsa térmica? (Negro o Rosado)")
 
+    # Escoger color
+    elif pedido and not pedido.color:
+        if mensaje_usuario in ["negro", "rosado"]:
+            pedido.color = mensaje_usuario.title()
+            db.session.commit()
+            msg.body("Perfecto 🎨 ¿Cuántas unidades deseas?")
+        else:
+            msg.body("Solo tenemos disponibles en *Negro* o *Rosado*. Por favor elige uno de esos colores.")
 
-         # Enviar correo a la admin
+    # Escoger cantidad
+    elif pedido and pedido.color and not pedido.cantidad:
+        try:
+            cantidad = int(mensaje_usuario)
+            pedido.cantidad = cantidad
+            pedido.precio_total = cantidad * 18
+            db.session.commit()
+            msg.body("¿Cuál será tu método de pago? (Transferencia o Efectivo)")
+        except ValueError:
+            msg.body("Por favor ingresa un número válido para la cantidad.")
+
+    # Escoger método de pago
+    elif pedido and not pedido.metodo_pago:
+        if "transferencia" in mensaje_usuario:
+            pedido.metodo_pago = "Transferencia"
+            db.session.commit()
+            msg.body(
+                "Perfecto, realiza la consignación a esta cuenta:\n\n"
+                "*Banco Pichincha*\n"
+                "Cuenta de ahorro transaccional\n"
+                "Número: *2204633778*\n"
+                "A nombre de: *Ángela Magali Camacho Yaguana*\n\n"
+                "Cuando completes el pago, envíame tu *dirección de entrega*. 🚚"
+            )
+        elif "efectivo" in mensaje_usuario:
+            pedido.metodo_pago = "Efectivo"
+            db.session.commit()
+            msg.body(
+                "Perfecto. Puedes pagar el total en efectivo.\n\n"
+                "Por favor, envíame tu *dirección de entrega* o especifica si deseas recoger de forma *presencial*."
+            )
+        else:
+            msg.body("Métodos aceptados: *Transferencia* o *Efectivo*. Por favor selecciona uno de ellos.")
+
+    # Dirección (domicilio o presencial)
+    elif pedido and not pedido.direccion:
+        if "presencial" in mensaje_usuario:
+            pedido.direccion = "Presencial - Afuera de la Universidad Nacional de Loja, Av. Pío Jaramillo Alvarado y Reinaldo Espinosa​ Loja, Ecuador"
+            pedido.precio_total += 0  # Sin envío
+            db.session.commit()
+            msg.body(
+                "Perfecto, puedes recoger tu pedido en:\n"
+                "*Afuera de la Universidad Nacional de Loja*\n"
+                "Av. Pío Jaramillo Alvarado y Reinaldo Espinosa, Loja, Ecuador.\n\n"
+                "¡Gracias! Tu pedido ha sido registrado y está pendiente de confirmación."
+            )
+
+        elif "ecuador" in mensaje_usuario or "domicilio" in mensaje_usuario:
+            pedido.direccion = "Domicilio en Ecuador (pendiente de confirmar ubicación exacta)"
+            pedido.precio_total += 6  # envío adicional por Servientrega
+            db.session.commit()
+            msg.body(
+                "🚚 Perfecto, realizaremos el envío por *Servientrega* (+6 USD de envío).\n"
+                "Por favor confirma la provincia y dirección exacta dentro de Ecuador."
+            )
+
+        else:
+            msg.body("❌ Por ahora solo realizamos envíos dentro del *territorio nacional de Ecuador*. Si estás en otro país, aún no contamos con cobertura internacional.")
+
+    # Cierre del pedido
+    elif pedido and pedido.direccion:
+        msg.body("✅ Gracias, tu pedido ya fue registrado completamente. En breve recibirás confirmación por WhatsApp y correo electrónico.")
+
+        # Enviar correo a admin con el pedido
         cuerpo = f"""
         Nuevo pedido recibido:
+
         Cliente: {pedido.nombre_cliente}
         Teléfono: {pedido.telefono}
         Color: {pedido.color}
         Cantidad: {pedido.cantidad}
-        Precio total: {pedido.precio_total}
+        Precio total (USD): {pedido.precio_total}
         Método de pago: {pedido.metodo_pago}
         Dirección: {pedido.direccion}
         """
         enviar_correo_admin("Nuevo pedido recibido en Ziloy", cuerpo)
+
     else:
-        msg.body("No entendí 😅. Por favor, empieza diciendo *Hola*.")
+        msg.body("No logré entenderte 😅. Por favor empieza diciendo *Hola* para hacer un nuevo pedido.")
 
     return str(resp)
 
@@ -345,14 +396,14 @@ def admin_dashboard():
 def enviar_correo_nuevo_pedido(pedido):
     try:
         msg = Message(
-            subject="📦 Nuevo pedido recibido - Ziloy",
+            subject="Nuevo pedido recibido - Ziloy",
             recipients=[os.getenv("ADMIN_EMAIL")],
             body=f"""
 ¡Hola!
 
 Se ha recibido un nuevo pedido en Ziloy.
 
-🧾 Detalles del pedido:
+Detalles del pedido:
 - Cliente: {pedido.cliente.nombre}
 - Teléfono: {pedido.cliente.telefono}
 - Color: {pedido.color}
@@ -365,10 +416,65 @@ Se ha recibido un nuevo pedido en Ziloy.
 """
         )
         mail.send(msg)
-        print("✅ Correo enviado al admin correctamente.")
+        print("Correo enviado al admin correctamente.")
     except Exception as e:
-        print("❌ Error al enviar el correo:", e)
+        print("Error al enviar el correo:", e)
 
+# ===== RUTAS DE ACCIÓN ADMIN =====
+@app.route('/rechazar/<int:pedido_id>')
+def rechazar_pedido(pedido_id):
+    if not session.get('is_admin'):
+        flash("No tienes permisos para realizar esta acción.", "error")
+        return redirect(url_for('login'))
+
+    pedido = Pedido.query.get(pedido_id)
+    if pedido:
+        pedido.estado = "rechazado"
+        db.session.commit()
+        flash(f"Pedido #{pedido.id} rechazado.", "warning")
+
+        # Avisar por WhatsApp al cliente
+        try:
+            client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
+            client.messages.create(
+                body=f"❌ Hola {pedido.nombre_cliente}, tu pedido ha sido rechazado. Revisa los datos de la transferencia e inténtalo nuevamente.",
+                from_=os.getenv("TWILIO_WHATSAPP_FROM"),
+                to=f"whatsapp:{pedido.telefono}"
+            )
+        except Exception as e:
+            logging.error(f"Error al avisar rechazo vía WhatsApp: {e}")
+    else:
+        flash("Pedido no encontrado.", "error")
+
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/entregar/<int:pedido_id>')
+def entregar_pedido(pedido_id):
+    if not session.get('is_admin'):
+        flash("No tienes permisos para marcar entregas.", "error")
+        return redirect(url_for('login'))
+
+    pedido = Pedido.query.get(pedido_id)
+    if pedido:
+        pedido.estado = "entregado"
+        db.session.commit()
+        flash(f"Pedido #{pedido.id} marcado como entregado.", "success")
+
+        # Notificar al cliente por WhatsApp
+        try:
+            client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
+            client.messages.create(
+                body=f"¡Hola {pedido.nombre_cliente}! Tu pedido ha sido *entregado exitosamente*. 🎉 Gracias por confiar en Ziloy 👜",
+                from_=os.getenv("TWILIO_WHATSAPP_FROM"),
+                to=f"whatsapp:{pedido.telefono}"
+            )
+        except Exception as e:
+            logging.error(f"Error al avisar entrega vía WhatsApp: {e}")
+    else:
+        flash("Pedido no encontrado.", "error")
+
+    return redirect(url_for('admin_dashboard'))
 # ===== INICIAR SERVIDOR =====
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
