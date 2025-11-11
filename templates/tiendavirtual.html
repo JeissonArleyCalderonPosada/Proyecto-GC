@@ -124,9 +124,9 @@
             }
         };
 
-        // 3. Función de Actualización (NUEVO: Lógica unificada para imagen y descripción)
+        // 3. Función de Actualización 
         function updateProductDetails(color) {
-            // Rutas de imágenes (Usando las rutas de tu archivo)
+            // Rutas de imágenes 
             const imagePaths = {
                 'black': "{{ url_for('static', filename='images/ziloy_negro.png') }}",
                 'pink': "{{ url_for('static', filename='images/ziloy_rosado.png') }}"
@@ -227,7 +227,7 @@
     <!-- === SCRIPT DE CONTROL DEL MODAL === -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const btnComprar = document.querySelector('.product-details .btn'); 
+            const btnComprar = document.querySelector('.product-details .btn');
             const overlay = document.getElementById('purchaseOverlay');
             const btnCancelar = document.getElementById('cancelPurchase');
             const btnConfirmar = document.getElementById('confirmPurchase');
@@ -245,18 +245,12 @@
                 document.body.classList.remove('blurred');
             });
 
-            // Enviar saludo al bot (modo desarrollo)
+            // Enviar saludo al bot 
             if (btnConfirmar) {
                 btnConfirmar.addEventListener('click', async () => {
                     try {
-                        const response = await fetch("/whatsapp", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                            
-                            body: new URLSearchParams({
-                                Body: "hola",
-                                From: "whatsapp:+14155238886"
-                            })
+                        const response = await fetch("/enviar_mensaje_whatsapp", {
+                            method: "POST"
                         });
                         if (response.ok) {
                             alert("Mensaje automático enviado al chatbot de WhatsApp.");

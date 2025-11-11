@@ -19,13 +19,13 @@ from flask_mail import Message, Mail
 
 logging.basicConfig(level=logging.INFO)
 
+load_dotenv()  # carga las variables del archivo .env
+
 app = Flask(__name__)
 CORS(app)
 app.secret_key = "clave_super_segura"
 
 #Configuracion de la base de datos
-load_dotenv()  # carga las variables del archivo .env
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -170,7 +170,6 @@ def register():
 
     return render_template('registro.html')
 
-
 def enviar_confirmacion_whatsapp(telefono, nombre_cliente):
     """Envía un mensaje de confirmación al cliente vía WhatsApp usando Twilio."""
     account_sid = os.getenv("TWILIO_ACCOUNT_SID")
@@ -210,7 +209,7 @@ def confirmar_pedido(pedido_id):
     else:
         flash("Pedido no encontrado.", "error")
 
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_dashboard'))#
 
 def enviar_correo_admin(asunto, cuerpo):
     """Envía un correo a la dueña del negocio notificando un nuevo pedido."""
@@ -259,6 +258,51 @@ def prediccion():
         return jsonify({"reply": resultado})
     except Exception as e:
         return jsonify({"reply": f"Ocurrió un error en la predicción: {str(e)}"})
+
+# ===== RUTA PARA ENVIAR MENSAJE DE PRUEBA AL PROPIO WHATSAPP DEL DESARROLLADOR =====
+@app.route("/enviar_mensaje_whatsapp", methods=["POST"])
+def enviar_mensaje_whatsapp():
+    """Envía un mensaje 'hola' al número del desarrollador definido en TWILIO_WHATSAPP_TO,
+    ignorando temporalmente el teléfono del usuario en sesión."""
+    if not session.get('user_id'):
+        return jsonify({"status": "error", "message": "Usuario no autenticado"}), 401
+
+    usuario = Usuario.query.get(session['user_id'])
+    nombre = usuario.nombre if usuario else "Usuario no identificado"
+
+    try:
+        account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+        auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+        whatsapp_from = os.getenv("TWILIO_WHATSAPP_FROM")
+        whatsapp_to = os.getenv("TWILIO_WHATSAPP_TO")  #número personal de prueba
+
+        if not all([account_sid, auth_token, whatsapp_from, whatsapp_to]):
+            logging.error("Faltan credenciales Twilio en .env")
+            return jsonify({"status": "error", "message": "Configuración Twilio incompleta"}), 500
+
+        sid_raw = os.getenv("TWILIO_ACCOUNT_SID")
+        token_raw = os.getenv("TWILIO_AUTH_TOKEN")
+        from_num_raw = os.getenv("TWILIO_WHATSAPP_FROM")
+        
+        account_sid = sid_raw.strip() if sid_raw else None
+        auth_token = token_raw.strip() if token_raw else None
+        twilio_whatsapp_number = from_num_raw.strip() if from_num_raw else None
+
+        client = Client(account_sid, auth_token)
+        body_text = f"hola - mensaje automático desde Ziloy | Usuario en sesión: {nombre}"
+
+        message = client.messages.create(
+            body=body_text,
+            from_=whatsapp_from,
+            to=f"whatsapp:{whatsapp_to}"
+        )
+
+        logging.info(f"📨 Mensaje enviado a {whatsapp_to}. SID: {message.sid}")
+        return jsonify({"status": "success", "message": f"Mensaje enviado al número de prueba: {whatsapp_to}"})
+
+    except Exception as e:
+        logging.error(f"Error enviando mensaje WhatsApp: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
     
 # ===== RUTA CHATBOT WHATSAPP =====
 @app.route("/whatsapp", methods=["POST"])
@@ -437,7 +481,7 @@ def rechazar_pedido(pedido_id):
         try:
             client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
             client.messages.create(
-                body=f"❌ Hola {pedido.nombre_cliente}, tu pedido ha sido rechazado. Revisa los datos de la transferencia e inténtalo nuevamente.",
+                body=f"Hola {pedido.nombre_cliente}, tu pedido ha sido rechazado. Revisa los datos de la transferencia e inténtalo nuevamente.",
                 from_=os.getenv("TWILIO_WHATSAPP_FROM"),
                 to=f"whatsapp:{pedido.telefono}"
             )
@@ -475,6 +519,8 @@ def entregar_pedido(pedido_id):
         flash("Pedido no encontrado.", "error")
 
     return redirect(url_for('admin_dashboard'))
+
+
 # ===== INICIAR SERVIDOR =====
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
