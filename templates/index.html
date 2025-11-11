@@ -108,81 +108,101 @@
     <section class="how-it-works py-10 md-2">
         <div class="container text-center">
             <div class="row align-items-center justify-content-center">
-                <div class="col-md-10">
+                <div class="col-md-20">
                     <div class="cards">
-                        <div class="card color">
-                            <p class="step-number">1</p>
-                            <p class="second-text">Llena tu bolsa térmica con la bebida deseada.</p>
+                        
+                        <div class="card video-bg"> <video class="card-video" autoplay muted loop playsinline>
+                                <source src="{{ url_for('static', filename='videos/Paso1.mp4') }}" type="video/mp4">
+                            </video>
+                            
+                            <div class="card-content-overlay">
+                                <p class="step-number">1</p>
+                                <p class="second-text">Llena tu bolsa térmica con la bebida deseada.</p>
+                            </div>
                         </div>
-                        <div class="card color">
-                            <p class="step-number">2</p>
-                            <p class="second-text">La pantalla digital muestra la temperatura en segundos.</p>
+                        
+                        <div class="card video-bg"> 
+                            <video class="card-video" autoplay muted loop playsinline>
+                                <source src="{{ url_for('static', filename='videos/Paso2.mp4') }}" type="video/mp4">
+                            </video>
+                            <div class="card-content-overlay">
+                                <p class="step-number">2</p>
+                                <p class="second-text">La pantalla digital muestra la temperatura en segundos.</p>
+                            </div>
                         </div>
-                        <div class="card color">
-                            <p class="step-number">3</p>
-                            <p class="second-text">Disfruta tu bebida perfecta, siempre a la temperatura ideal.</p>
+                        
+                        <div class="card video-bg"> 
+                            <video class="card-video" autoplay muted loop playsinline>
+                                <source src="{{ url_for('static', filename='videos/Paso3.mp4') }}" type="video/mp4">
+                            </video>
+                            <div class="card-content-overlay">
+                                <p class="step-number">3</p>
+                                <p class="second-text">Disfruta tu bebida perfecta, siempre a la temperatura ideal.</p>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SECCIÓN TESTIMONIOS -->
     <section class="how-it-works py-5 md-2">
         <h2 class="section-title mb-4 text-uppercase fw-bold text-center" style="color:#00c9a7;">
         ¿Por qué elegir ZILOY?
         </h2>
-        <div class="container mb-4">
+        <div class="container-fluid">
             <div class="row justify-content-center">
-                <div class="col-14 col-md-11 col-lg-10">
+                <div class="col-12"> 
                     <div class="row g-0 custom-card">
-                        <div class="col-md-3 card-img-side">
+                        <div class="col-md-4 card-img-side">
                             <video autoplay muted loop playsinline>
                                 <source src="{{ url_for('static', filename='videos/MuestraIndividual.mp4') }}" type="video/mp4">
                             </video>
                         </div>
 
-                        <!-- Texto -->
-                        <div class="col-md-9 card-text-side">
+                        <div class="col-md-8 card-text-side">
                             <div>
                                 <h4 class="fw-bold">Tu Aliado Diario: Estilo, Comodidad y Tecnología</h4>
-                                <p class="mb-0">
-                                Ziloy está diseñada para adaptarse a tu ritmo de vida. Su diseño ergonómico y portátil te permite llevar<br>
-                                tu bebida caliente favorita a cualquier lugar; ya sea la universidad, la oficina, en un viaje o en actividades <br>
-                                al aire libre. 
-                                <p>Olvídate de los termos incómodos; Ziloy es una solución que responde a tu necesidad fundamental <br>
-                                    de comodidad y movilidad
+                                
+                                <p>
+                                    Ziloy está diseñada para adaptarse a tu ritmo de vida. Su diseño ergonómico y portátil te permite llevar 
+                                    tu bebida caliente favorita a cualquier lugar; ya sea la universidad, la oficina,en un viaje o en actividades 
+                                    al aire libre.<br>
+                                    Olvídate de los termos incómodos; Ziloy es una solución que responde a tu necesidad
+                                    fundamental de comodidad y movilidad.
                                 </p>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="container mb-2">
+        <div class="container-fluid">
             <div class="row justify-content-center">
-                <div class="col-12 col-md-11 col-lg-10">
+                <div class="col-14">
                 <div class="row g-0 custom-card flex-row-reverse">
-                    <div class="col-md-3 card-img-side-right">
+
+                    <div class="col-md-4 card-img-side-right">
                         <video autoplay muted loop playsinline>
                             <source src="{{ url_for('static', filename='videos/GrupoZiloy.mp4') }}" type="video/mp4">
                         </video>
                     </div>
 
-                    <!-- Texto (izquierda) -->
-                    <div class="col-md-9 card-text-side-right">
+                    <div class="col-md-8 card-text-side-right">
                         <div>
-                            <h4 class="fw-bold">|     La Compañía Perfecta para Compartir y Celebrar</h4>
-                            <p class="mb-0">
-                            <p>|      ¿Planeando una reunión, una noche de juegos o una escapada con amigos? Ziloy es tu compañero ideal para <br>
-                                |      cualquier evento grupal.Ziloy facilita que compartas momentos cálidos con tus amigos, llevando el mood <br>
-                                |      perfecto a picnics, fogatas, reuniones en casa o celebraciones al aire libre. Su diseño portátil no solo es para ti,<br> 
-                                |      sino para asegurar que el ambiente y el sabor nunca decaigan.
+                            <h4 class="fw-bold">La Compañía Perfecta para Compartir y Celebrar</h4>
+                            
+                            <p>
+                                ¿Planeando una reunión, una noche de juegos o una escapada con amigos? Ziloy es tu compañero ideal para cualquier evento grupal. Ziloy facilita que compartas momentos cálidos con tus amigos, llevando el mood
+                                perfecto a picnics, fogatas, reuniones en casa o celebraciones al aire libre. <br>
+                                Su diseño portátil no solo es para ti, sino para asegurar que el ambiente y el sabor nunca decaigan.
                             </p>
                         </div>
                     </div>
+
                 </div>
                 </div>
             </div>

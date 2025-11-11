@@ -30,7 +30,7 @@
 
     <section class="how-it-works py-5">
         <main class="text-center py-1">
-            <h2 class="mb-4" style="color:#00c9a7;">Tienda Virtual</h2>
+            <h2 class="mb-4" style="color:#ffffff;">Bienvenido a tu Tienda Virtual</h2>
             <p class="lead" style="max-width: 800px; margin: auto;">
                 Explora nuestra tienda virtual y descubre productos innovadores diseñados para
                 mejorar tu día a día. Calidad, sostenibilidad y tecnología al alcance de tu mano.
@@ -46,7 +46,7 @@
                 <!-- IMAGEN DEL PRODUCTO -->
                 <div class="product-image text-center">
                     <img id="productImage" src="{{ url_for('static', filename='images/ziloy_negro.png') }}" 
-                        alt="Bolsa Térmica Ziloy" class="img-fluid rounded shadow" style="max-width: 350px;">
+                        alt="Bolsa Térmica Ziloy" class="img-fluid rounded shadow" style="max-width: 320px;">
                     <div class="color-buttons d-flex justify-content-center gap-3 mt-3">
                         <button class="color-btn" id="blackBtn" style="background-color: black;"></button>
                         <button class="color-btn" id="pinkBtn" style="background-color: pink;"></button>
@@ -56,10 +56,10 @@
                 <!-- DETALLES DEL PRODUCTO -->
                 <div class="product-details text-center text-md-start">
                     <h2 class="fw-bold" style="color:#00c9a7;">Bolsa Térmica Ziloy</h2>
-                    <p>Mantén tus bebidas a la temperatura perfecta, con estilo y tecnología inteligente.</p>
+                    <p class="mb-5">Mantén tus bebidas a la temperatura perfecta, con estilo y tecnología inteligente.</p>
 
                     <div class="price-box d-flex align-items-center justify-content-center justify-content-md-start gap-3 mt-3">
-                        <span id="price" class="price fw-bold fs-4" style="color:#00c9a7;">$89.900</span>
+                        <span id="price" class="price fw-bold fs-4" style="color:#00c9a7;">USD $18</span>
 
                         <div class="quantity-box d-flex align-items-center border rounded px-2">
                             <button class="btn-qty" id="decreaseBtn">-</button>
@@ -71,6 +71,10 @@
                     <button class="btn mt-4 px-4 py-2 fw-bold text-light" 
                             style="background-color:#00c9a7; border-radius:30px;">Comprar
                     </button>
+
+                    <div id="colorDescriptionCard" class="color-card mt-4 p-3 rounded shadow-sm">
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -80,6 +84,8 @@
         <p>&copy; 2025 - Ziloy | UCundinamarca y UNL</p>
     </footer>
 
+
+    
     <!--CHATBOT FLOTANTE-->
     <div id="chatbotPopup" class="chatbot-popup" style="display:none;">
         <div class="chatbot-header">
@@ -97,20 +103,56 @@
 
     <!-- CAMBIO DE COLOR DEL PRODUCTO -->
     <script>
+        // 1. Elementos para el CAMBIO DE COLOR (IMAGEN y DESCRIPCIÓN)
         const productImage = document.getElementById("productImage");
         const blackBtn = document.getElementById("blackBtn");
         const pinkBtn = document.getElementById("pinkBtn");
+        const descriptionCard = document.getElementById("colorDescriptionCard"); // NUEVO: Elemento de la descripción
 
-        blackBtn.addEventListener("click", () => {
-            productImage.src = "{{ url_for('static', filename='images/ziloy_negro.png') }}";
-        });
+        // 2. Contenido de las descripciones (NUEVO)
+        const descriptions = {
+            'black': {
+                title: 'Edición Elegancia Profesional',
+                text: 'El color negro confiere un aire de sofisticación y profesionalismo. Es la elección ideal para el ambiente de oficina o reuniones importantes, ofreciendo una imagen elegante y atemporal.'
+            },
+            'pink': {
+                title: 'Toque Casual y Vibrante',
+                text: 'La opción rosado es más informal, pero con un encanto único. Es agradable a la vista y perfecta para el uso diario, la universidad o actividades al aire libre, reflejando una personalidad alegre.'
+            }
+        };
 
-        pinkBtn.addEventListener("click", () => {
-            productImage.src = "{{ url_for('static', filename='images/ziloy_rosado.png') }}";
+        // 3. Función de Actualización (NUEVO: Lógica unificada para imagen y descripción)
+        function updateProductDetails(color) {
+            // Rutas de imágenes (Usando las rutas de tu archivo)
+            const imagePaths = {
+                'black': "{{ url_for('static', filename='images/ziloy_negro.png') }}",
+                'pink': "{{ url_for('static', filename='images/ziloy_rosado.png') }}"
+            };
+
+            // A. Actualiza la Imagen
+            productImage.src = imagePaths[color];
+
+            // B. Actualiza la Descripción (Solo si el elemento existe)
+            if (descriptionCard) {
+                const desc = descriptions[color];
+                descriptionCard.innerHTML = `
+                    <h5>${desc.title}</h5>
+                    <p>${desc.text}</p>
+                `;
+            }
+        }
+
+        // 4. Asignar Event Listeners (USANDO LA NUEVA FUNCIÓN)
+        blackBtn.addEventListener("click", () => updateProductDetails('black'));
+        pinkBtn.addEventListener("click", () => updateProductDetails('pink'));
+
+        // 5. Estado Inicial (Muestra la descripción negra al cargar)
+        document.addEventListener('DOMContentLoaded', () => {
+            updateProductDetails('black');
         });
 
         // === CONTROL DE CANTIDAD Y PRECIO ===
-        const basePrice = 89900;
+        const basePrice = 18;
         const priceEl = document.getElementById("price");
         const quantityInput = document.getElementById("quantity");
         const increaseBtn = document.getElementById("increaseBtn");
@@ -119,7 +161,7 @@
         function updatePrice() {
             const quantity = parseInt(quantityInput.value);
             const total = basePrice * quantity;
-            priceEl.textContent = `$${total.toLocaleString("es-CO")}`;
+            priceEl.textContent = `USD $${total.toLocaleString("es-CO")}`;
         }
 
         increaseBtn.addEventListener("click", () => {
